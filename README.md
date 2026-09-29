@@ -1,2 +1,0 @@
-# boarding-house-bills-app
-
