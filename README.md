@@ -22,7 +22,7 @@
 
 ### Business Process Flow Chart
 
-![Business Process Flow Chart](/docs_images/flowchart.png.png)
+![Business Process Flow Chart](/docs_images/flowchart.png)
 
 ### System Architecture
 
