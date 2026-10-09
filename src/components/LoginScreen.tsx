@@ -1,21 +1,24 @@
 import { colors } from "@/constants/theme";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-    KeyboardAvoidingView, Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  KeyboardAvoidingView, Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import LogoMark from "./ui/LogoMark";
 import PrimaryButton from "./ui/PrimaryButton";
 import TextField from "./ui/TextField";
 
+
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
   const handleSignIn = () => {
     console.log("sign in", email);
@@ -74,9 +77,13 @@ export default function LoginScreen() {
             <PrimaryButton title="Sign in" icon="arrow-forward" onPress={handleSignIn} />
           </View>
 
-          <Text style={styles.footer}>
-            Need an account? Ask your boarding-house owner for your sign-in details.
-          </Text>
+          <Pressable
+              style={({ pressed }) => [styles.secondary, pressed && { opacity: 0.7 }]}
+              onPress={() => router.push("/register")}
+            >
+              <Text style={styles.secondaryText}>Create an account</Text>
+            </Pressable>
+
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -107,4 +114,14 @@ const styles = StyleSheet.create({
   subtitle: { marginTop: 6, fontSize: 15, lineHeight: 22, color: colors.muted },
   forgot: { marginTop: 18, fontSize: 13, fontWeight: "600", color: colors.brown },
   footer: { marginTop: 28, fontSize: 13, lineHeight: 19, color: colors.muted },
+  secondary: {
+  marginTop: 12,
+  height: 48,
+  borderRadius: 10,
+  borderWidth: 1,
+  borderColor: colors.brown,
+  alignItems: "center",
+  justifyContent: "center",
+},
+secondaryText: { fontSize: 15, fontWeight: "600", color: colors.brown },
 });

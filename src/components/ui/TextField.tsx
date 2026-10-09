@@ -1,9 +1,12 @@
 import { colors } from "@/constants/theme";
 import { StyleSheet, Text, TextInput, TextInputProps, View } from "react-native";
 
-type Props = TextInputProps & { label: string };
+type Props = TextInputProps & {
+  label: string;
+  hint?: string;
+};
 
-export default function TextField({ label, style, ...rest }: Props) {
+export default function TextField({ label, hint, style, ...rest }: Props) {
   return (
     <View style={styles.wrap}>
       <Text style={styles.label}>{label}</Text>
@@ -12,6 +15,7 @@ export default function TextField({ label, style, ...rest }: Props) {
         style={[styles.input, style]}
         {...rest}
       />
+      {hint ? <Text style={styles.hint}>{hint}</Text> : null}
     </View>
   );
 }
@@ -29,4 +33,5 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     color: colors.text,
   },
+  hint: { marginTop: 8, fontSize: 12, color: colors.muted },
 });
