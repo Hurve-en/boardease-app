@@ -24,6 +24,16 @@ export const Colors = {
   },
 } as const;
 
+export const colors = {
+  bg: "#F7F3EC",
+  brown: "#643D2B",
+  card: "#EDE0D0",
+  text: "#2B2118",
+  muted: "#857B70",
+  border: "#E8E0D4",
+  white: "#FFFFFF",
+};
+
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
 export const Fonts = Platform.select({
