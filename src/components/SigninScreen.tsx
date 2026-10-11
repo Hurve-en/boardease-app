@@ -2,18 +2,18 @@ import { colors } from "@/constants/theme";
 import { Link } from "expo-router";
 import { useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Platform, ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import AuthHeader from "./ui/Authheader";
+import AuthHeader from "./ui/AuthHeader";
 import PrimaryButton from "./ui/PrimaryButton";
 import TextField from "./ui/TextField";
-
 
 export default function RegisterScreen() {
   const [name, setName] = useState("");
@@ -95,7 +95,9 @@ export default function RegisterScreen() {
 
           <Text style={styles.login}>
             Already have an account?{" "}
-            <Link href="/" style={styles.bold}>Log in</Link>
+            <Link href="/" style={styles.bold}>
+              Log in
+            </Link>
           </Text>
 
           <Text style={styles.footer}>

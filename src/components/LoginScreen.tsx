@@ -1,8 +1,11 @@
 import { colors } from "@/constants/theme";
+import { supabase } from "@/lib/supabase";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  KeyboardAvoidingView, Platform,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -13,15 +16,27 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import LogoMark from "./ui/LogoMark";
 import PrimaryButton from "./ui/PrimaryButton";
 import TextField from "./ui/TextField";
-
-
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const handleSignIn = () => {
-    console.log("sign in", email);
+  const handleSignIn = async () => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) return Alert.alert("Sign in failed", error.message);
+
+    const { data } = await supabase.auth.getClaims();
+    const role = (data?.claims as { user_role?: string } | undefined)
+      ?.user_role;
+
+    if (role !== "tenant") {
+      await supabase.auth.signOut();
+      Alert.alert("Not allowed", "This app is for tenants only.");
+    }
   };
 
   return (
@@ -74,16 +89,22 @@ export default function LoginScreen() {
           </Pressable>
 
           <View style={{ marginTop: 18 }}>
-            <PrimaryButton title="Sign in" icon="arrow-forward" onPress={handleSignIn} />
+            <PrimaryButton
+              title="Sign in"
+              icon="arrow-forward"
+              onPress={handleSignIn}
+            />
           </View>
 
           <Pressable
-              style={({ pressed }) => [styles.secondary, pressed && { opacity: 0.7 }]}
-              onPress={() => router.push("/register")}
-            >
-              <Text style={styles.secondaryText}>Create an account</Text>
-            </Pressable>
-
+            style={({ pressed }) => [
+              styles.secondary,
+              pressed && { opacity: 0.7 },
+            ]}
+            onPress={() => router.push("/register")}
+          >
+            <Text style={styles.secondaryText}>Create an account</Text>
+          </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -112,16 +133,21 @@ const styles = StyleSheet.create({
   },
   title: { marginTop: 28, fontSize: 30, fontWeight: "700", color: colors.text },
   subtitle: { marginTop: 6, fontSize: 15, lineHeight: 22, color: colors.muted },
-  forgot: { marginTop: 18, fontSize: 13, fontWeight: "600", color: colors.brown },
+  forgot: {
+    marginTop: 18,
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.brown,
+  },
   footer: { marginTop: 28, fontSize: 13, lineHeight: 19, color: colors.muted },
   secondary: {
-  marginTop: 12,
-  height: 48,
-  borderRadius: 10,
-  borderWidth: 1,
-  borderColor: colors.brown,
-  alignItems: "center",
-  justifyContent: "center",
-},
-secondaryText: { fontSize: 15, fontWeight: "600", color: colors.brown },
+    marginTop: 12,
+    height: 48,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.brown,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  secondaryText: { fontSize: 15, fontWeight: "600", color: colors.brown },
 });
