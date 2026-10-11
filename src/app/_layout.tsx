@@ -1,18 +1,37 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { supabase } from "@/lib/supabase";
+import type { Session } from "@supabase/supabase-js";
+import { Stack } from "expo-router";
+import { useEffect, useState } from "react";
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+export default function RootLayout() {
+  const [session, setSession] = useState<Session | null>(null);
+  const [ready, setReady] = useState(false);
 
-SplashScreen.preventAutoHideAsync();
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setReady(true);
+    });
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => data.subscription.unsubscribe();
+  }, []);
+
+  if (!ready) return null;
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Protected guard={!!session}>
+        <Stack.Screen name="home" />
+      </Stack.Protected>
+
+      <Stack.Protected guard={!session}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="register" />
+      </Stack.Protected>
+    </Stack>
   );
 }
