@@ -28,11 +28,13 @@ export default function LoginScreen() {
     setProblem("");
     setNotice("");
 
-    if (!email) {
+    if (!email.trim()) {
       setProblem("Please enter your email address.");
+      return;
     }
     if (!password) {
       setProblem("Please enter your password.");
+      return;
     }
     if (password.length < 8) {
       setProblem("Password must be at least 8 characters.");
@@ -110,6 +112,16 @@ export default function LoginScreen() {
           </Pressable>
 
           <View style={{ marginTop: 18 }}>
+            {problem ? (
+              <View style={[styles.message, styles.errorMessage]} accessibilityRole="alert">
+                <Text style={styles.errorText}>{problem}</Text>
+              </View>
+            ) : null}
+            {notice ? (
+              <View style={[styles.message, styles.noticeMessage]} accessibilityRole="alert">
+                <Text style={styles.noticeText}>{notice}</Text>
+              </View>
+            ) : null}
             <PrimaryButton
               title="Sign in"
               icon="arrow-forward"
@@ -160,6 +172,17 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: colors.brown,
   },
+  message: {
+    marginBottom: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  errorMessage: { backgroundColor: "#FCEBE8", borderColor: "#E9B8B0" },
+  errorText: { color: "#9A3529", fontSize: 13, lineHeight: 19 },
+  noticeMessage: { backgroundColor: "#EAF4E9", borderColor: "#B9D5B6" },
+  noticeText: { color: "#34633A", fontSize: 13, lineHeight: 19 },
   footer: { marginTop: 28, fontSize: 13, lineHeight: 19, color: colors.muted },
   secondary: {
     marginTop: 12,

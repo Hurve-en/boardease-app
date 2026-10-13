@@ -50,7 +50,7 @@ export default function RegisterScreen() {
         options: { data: { name: name.trim() } },
       });
 
-      console.log("sign up successful", data, error);
+      console.log(data, error);
 
       if (error) {
         setProblem(error.message);
@@ -67,6 +67,8 @@ export default function RegisterScreen() {
     } finally {
       setBusy(false);
     }
+
+    console.log("Registering user:", { name, email, password, confirm });
   }
 
   return (
@@ -129,8 +131,16 @@ export default function RegisterScreen() {
             <Text style={styles.bold}>Privacy Policy</Text>.
           </Text>
 
-          {problem ? <Text>{problem}</Text> : null}
-          {notice ? <Text>{notice}</Text> : null}
+          {problem ? (
+            <View style={[styles.message, styles.errorMessage]} accessibilityRole="alert">
+              <Text style={styles.errorText}>{problem}</Text>
+            </View>
+          ) : null}
+          {notice ? (
+            <View style={[styles.message, styles.noticeMessage]} accessibilityRole="alert">
+              <Text style={styles.noticeText}>{notice}</Text>
+            </View>
+          ) : null}
 
           <PrimaryButton
             title="Create account"
@@ -166,6 +176,17 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     color: colors.muted,
   },
+  message: {
+    marginBottom: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  errorMessage: { backgroundColor: "#FCEBE8", borderColor: "#E9B8B0" },
+  errorText: { color: "#9A3529", fontSize: 13, lineHeight: 19 },
+  noticeMessage: { backgroundColor: "#EAF4E9", borderColor: "#B9D5B6" },
+  noticeText: { color: "#34633A", fontSize: 13, lineHeight: 19 },
   bold: { fontWeight: "700", color: colors.brown },
   login: { marginTop: 24, fontSize: 13, color: colors.muted },
   footer: { marginTop: 24, fontSize: 12, color: colors.muted },
