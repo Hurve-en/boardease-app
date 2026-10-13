@@ -1,5 +1,5 @@
-import SigninScreen from "@/components/SigninScreen";
+import RegisterScreen from "@/components/RegisterScreen";
 
 export default function Register() {
-  return <SigninScreen />;
+  return <RegisterScreen />;
 }

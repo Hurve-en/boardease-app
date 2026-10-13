@@ -1,9 +1,8 @@
 import { colors } from "@/constants/theme";
-import { signIn } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -21,11 +20,46 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const [problem, setProblem] = useState("");
+  const [notice, setNotice] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  const handleSignIn = async () => {
-    const error = await signIn(email.trim(), password);
-    if (error) Alert.alert("Sign in failed", error);
-  };
+  async function handleSignIn() {
+    setProblem("");
+    setNotice("");
+
+    if (!email) {
+      setProblem("Please enter your email address.");
+    }
+    if (!password) {
+      setProblem("Please enter your password.");
+    }
+    if (password.length < 8) {
+      setProblem("Password must be at least 8 characters.");
+      return;
+    }
+
+    setBusy(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+
+      if (error) {
+        setProblem(error.message);
+        return;
+      }
+
+      router.replace("/");
+    } catch (error) {
+      setProblem("Failed to sign in. Please check your credentials.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
