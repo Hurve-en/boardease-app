@@ -1,31 +1,73 @@
 import { colors } from "@/constants/theme";
-import { Link } from "expo-router";
+import { supabase } from "@/lib/supabase";
+import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Platform, ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-import AuthHeader from "./ui/Authheader";
+import AuthHeader from "./ui/AuthHeader";
 import PrimaryButton from "./ui/PrimaryButton";
 import TextField from "./ui/TextField";
-
 
 export default function RegisterScreen() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [problem, setProblem] = useState("");
+  const [notice, setNotice] = useState("");
+  const router = useRouter();
 
-  const handleRegister = () => {
-    if (password.length < 8) return console.log("password too short");
-    if (password !== confirm) return console.log("passwords don't match");
-    console.log("register", name, email);
-  };
+  async function submit() {
+    setProblem("");
+    setNotice("");
+
+    if (!name.trim()) {
+      setProblem("Enter your name.");
+      return;
+    }
+    if (password.length < 8) {
+      setProblem("Password must be at least 8 characters.");
+      return;
+    }
+    if (password !== confirm) {
+      setProblem("Passwords don't match.");
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: { data: { name: name.trim() } },
+      });
+
+      console.log("sign up successful", data, error);
+
+      if (error) {
+        setProblem(error.message);
+        return;
+      }
+
+      setNotice(
+        data.session
+          ? "Account created successfully."
+          : "Check your email for a confirmation link.",
+      );
+    } catch {
+      setProblem("Sign up failed. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -87,15 +129,20 @@ export default function RegisterScreen() {
             <Text style={styles.bold}>Privacy Policy</Text>.
           </Text>
 
+          {problem ? <Text>{problem}</Text> : null}
+          {notice ? <Text>{notice}</Text> : null}
+
           <PrimaryButton
             title="Create account"
             icon="arrow-forward"
-            onPress={handleRegister}
+            onPress={submit}
           />
 
           <Text style={styles.login}>
             Already have an account?{" "}
-            <Link href="/" style={styles.bold}>Log in</Link>
+            <Link href="/login" style={styles.bold}>
+              Log in
+            </Link>
           </Text>
 
           <Text style={styles.footer}>
