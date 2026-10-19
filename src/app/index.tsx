@@ -1,19 +1,18 @@
-import { useRouter } from "expo-router";
-import { Pressable, Text } from "react-native";
+import {useRouter} from "expo-router";
+import {Pressable, Text, View} from "react-native";
 
 export default function HomeScreen() {
-  const router = useRouter();
+	const router = useRouter();
 
-  return (
-    <div>
-      <h1>Welcome to BoardEase</h1>
+	return (
+		<View style={{paddingTop: 60, paddingHorizontal: 24}}>
+			<Text>Welcome to BoardEase</Text>
 
-      <Pressable
-        style={({ pressed }) => [pressed && { opacity: 0.7 }]}
-        onPress={() => router.push("/login")}
-      >
-        <Text>Back to Login</Text>
-      </Pressable>
-    </div>
-  );
+			<Pressable
+				style={({pressed}) => [pressed && {opacity: 0.7}]}
+				onPress={() => router.push("/login")}>
+				<Text>Go to Login</Text>
+			</Pressable>
+		</View>
+	);
 }
