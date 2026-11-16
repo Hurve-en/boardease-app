@@ -1,6 +1,6 @@
  <div align="center">
 
-<img src="docs_images/BoardEase.png" alt="BoardEase Logo" width="200" />
+<img src="docs/images/BoardEase.png" alt="BoardEase Logo" width="200" />
 
 # BoardEase
 
@@ -277,15 +277,17 @@ Payment status is derived from payment records rather than manually selected by 
 
 ### Business Process Flowchart
 
-![BoardEase Business Process Flowchart](docs_images/flowchart.png)
+![BoardEase Business Process Flowchart](docs/images/flowchart.png)
 
 ### System Architecture Diagram
 
-![BoardEase System Architecture](docs_images/systemarchitecture.png)
+![BoardEase System Architecture](docs/images/systemarchitecture.png)
 
 ### Entity Relationship Diagram
 
-![BoardEase Entity Relationship Diagram](docs_images/image_erd.png)
+This diagram is outdated and is retained for reference. The web backend owns the current database schema and migrations.
+
+![BoardEase Entity Relationship Diagram](docs/images/erd.png)
 
 ---
 

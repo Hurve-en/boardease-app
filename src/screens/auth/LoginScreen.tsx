@@ -12,9 +12,9 @@ import {
 	View,
 } from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
-import LogoMark from "./ui/LogoMark";
-import PrimaryButton from "./ui/PrimaryButton";
-import TextField from "./ui/TextField";
+import AuthHeader from "@/components/auth/AuthHeader";
+import PrimaryButton from "@/components/ui/PrimaryButton";
+import TextField from "@/components/ui/TextField";
 
 export default function LoginScreen() {
 	const [email, setEmail] = useState("");
@@ -68,15 +68,7 @@ export default function LoginScreen() {
 				<ScrollView
 					contentContainerStyle={styles.container}
 					keyboardShouldPersistTaps="handled">
-					<View style={styles.logoRow}>
-						<LogoMark size={36} />
-						<Text style={styles.brand}>BoardEase</Text>
-					</View>
-
-					<View style={styles.hero}>
-						<LogoMark size={66} />
-						<Text style={styles.heroLabel}>TENANT WORKSPACE</Text>
-					</View>
+					<AuthHeader />
 
 					<Text style={styles.title}>Welcome home.</Text>
 					<Text style={styles.subtitle}>
@@ -144,23 +136,6 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
 	safe: {flex: 1, backgroundColor: colors.bg},
 	container: {padding: 28, paddingTop: 24},
-	logoRow: {flexDirection: "row", alignItems: "center", gap: 12},
-	brand: {fontSize: 24, fontWeight: "700", color: colors.brown},
-	hero: {
-		marginTop: 28,
-		height: 148,
-		borderRadius: 24,
-		backgroundColor: colors.card,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	heroLabel: {
-		marginTop: 14,
-		fontSize: 11,
-		fontWeight: "600",
-		letterSpacing: 0.5,
-		color: colors.brown,
-	},
 	title: {marginTop: 28, fontSize: 30, fontWeight: "700", color: colors.text},
 	subtitle: {marginTop: 6, fontSize: 15, lineHeight: 22, color: colors.muted},
 	forgot: {

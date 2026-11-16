@@ -11,9 +11,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import AuthHeader from "./ui/AuthHeader";
-import PrimaryButton from "./ui/PrimaryButton";
-import TextField from "./ui/TextField";
+import AuthHeader from "@/components/auth/AuthHeader";
+import PrimaryButton from "@/components/ui/PrimaryButton";
+import TextField from "@/components/ui/TextField";
 
 export default function RegisterScreen() {
   const [name, setName] = useState("");
