@@ -5,18 +5,6 @@ import { Platform } from "react-native";
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL?.trim();
 const key = process.env.EXPO_PUBLIC_SUPABASE_KEY?.trim();
 
-if (!url) {
-  throw new Error(
-    "Missing EXPO_PUBLIC_SUPABASE_URL. Restart Expo from the project root with: npm.cmd start -- --clear",
-  );
-}
-
-if (!key) {
-  throw new Error(
-    "Missing EXPO_PUBLIC_SUPABASE_KEY. Restart Expo from the project root with: npm.cmd start -- --clear",
-  );
-}
-
 const webStorage = {
   getItem: async (storageKey: string) =>
     typeof window === "undefined"
@@ -34,11 +22,11 @@ const webStorage = {
   },
 };
 
-export const supabase = createClient(url, key, {
+export const supabase = url && key ? createClient(url, key, {
   auth: {
     storage: Platform.OS === "web" ? webStorage : AsyncStorage,
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
   },
-});
+}) : null;

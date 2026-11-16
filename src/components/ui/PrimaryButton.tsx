@@ -6,13 +6,17 @@ type Props = {
   title: string;
   onPress: () => void;
   icon?: keyof typeof Ionicons.glyphMap;
+  disabled?: boolean;
 };
 
-export default function PrimaryButton({ title, onPress, icon }: Props) {
+export default function PrimaryButton({ title, onPress, icon, disabled = false }: Props) {
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [styles.button, pressed && { opacity: 0.85 }]}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      style={({ pressed }) => [styles.button, (pressed || disabled) && { opacity: 0.85 }]}
     >
       {icon && <Ionicons name={icon} size={16} color={colors.white} />}
       <Text style={styles.text}>{title}</Text>
