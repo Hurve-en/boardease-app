@@ -13,18 +13,18 @@ Use `npm run android`, `npm run ios`, or `npm run web` to open a particular plat
 
 ## API configuration
 
-`EXPO_PUBLIC_API_URL` is the backend origin without `/api`, for example `http://192.168.1.100:3000`. Replace the example IP with the computer running Next.js and make that server reachable on the local network.
+`EXPO_PUBLIC_API_URL` is the backend origin without `/api`, for example `http://192.168.1.100:3000`. Replace the example IP with the computer running Next.js and make that server reachable on the local network. Registration and login currently use Supabase Auth directly.
 
 A physical phone's `localhost` points to the phone, so use the computer's LAN IP. For the standard Android emulator, the host computer is available at `http://10.0.2.2:3000`. The iOS simulator and local web browser can use `http://localhost:3000`.
 
-The existing auth connection in `src/lib/auth.ts` uses:
+The backend data connection uses:
 
 | Endpoint | Request | Expected response |
 | --- | --- | --- |
-| `POST /api/login` | `{ email, password }` | `{ accessToken, refreshToken, user: { role: "tenant" } }` |
-| `POST /api/logout` | `{ accessToken, refreshToken }` | Local sign-out completes even when the backend is unreachable. |
+| `GET /api/me` | `Authorization: Bearer <Supabase access token>` | The authenticated profile |
+| `GET /api/customers` | `Authorization: Bearer <Supabase access token>` | Customer data, subject to backend authorization |
 
-The existing registration screen uses `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_KEY` directly. Set these to the Supabase project URL and public client key. Without them, login can still open and registration shows a configuration message on submission. Reload the app after changing environment values. The backend must allow the web app's origin when testing through a browser.
+The registration and login screens use `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_KEY` directly. Set these to the Supabase project URL and public client key. Without them, both screens show a configuration message on submission. Reload the app after changing environment values. The backend must allow the web app's origin when testing through a browser.
 
 `EXPO_PUBLIC_` values are bundled into the client. Database credentials and Supabase service-role keys belong on the backend.
 
