@@ -1,5 +1,9 @@
 This is an Expo/React Native mobile application. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
 
+## Saved project context
+
+Read `docs/project-context.md` for the product overview, implementation map, and known gaps. The user has confirmed the ERD image is outdated; do not treat it as the current schema contract. Recheck source code and forthcoming Figma/Jira requirements before implementation.
+
 ## Expo has changed — do not trust your training data
 
 Expo ships breaking changes every SDK release. APIs you remember are likely renamed, moved, or removed. Before writing any code that touches an Expo, EAS, or React Native API:

@@ -158,6 +158,8 @@ flowchart TD
 
 ## 🛠️ Technology Stack
 
+For local app installation, environment configuration, navigation, and verification commands, see [Mobile application setup](docs/mobile-setup.md).
+
 ### Frontend
 
 - **Next.js** — Admin web application.

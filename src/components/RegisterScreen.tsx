@@ -1,6 +1,6 @@
 import { colors } from "@/constants/theme";
 import { supabase } from "@/lib/supabase";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 import { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -23,11 +23,16 @@ export default function RegisterScreen() {
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState("");
   const [notice, setNotice] = useState("");
-  const router = useRouter();
 
   async function submit() {
+    if (busy) return;
     setProblem("");
     setNotice("");
+
+    if (!supabase) {
+      setProblem("Registration is not configured. Please contact the administrator.");
+      return;
+    }
 
     if (!name.trim()) {
       setProblem("Enter your name.");
@@ -50,8 +55,6 @@ export default function RegisterScreen() {
         options: { data: { name: name.trim() } },
       });
 
-      console.log(data, error);
-
       if (error) {
         setProblem(error.message);
         return;
@@ -67,8 +70,6 @@ export default function RegisterScreen() {
     } finally {
       setBusy(false);
     }
-
-    console.log("Registering user:", { name, email, password, confirm });
   }
 
   return (
@@ -143,7 +144,8 @@ export default function RegisterScreen() {
           ) : null}
 
           <PrimaryButton
-            title="Create account"
+            title={busy ? "Creating account…" : "Create account"}
+            disabled={busy}
             icon="arrow-forward"
             onPress={submit}
           />

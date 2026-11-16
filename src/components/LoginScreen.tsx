@@ -25,6 +25,7 @@ export default function LoginScreen() {
 	const [busy, setBusy] = useState(false);
 
 	async function handleSignIn() {
+		if (busy) return;
 		setProblem("");
 		setNotice("");
 
@@ -52,7 +53,7 @@ export default function LoginScreen() {
 			}
 
 			router.replace("/home");
-		} catch (error) {
+		} catch {
 			setProblem("Failed to sign in. Please check your credentials.");
 		} finally {
 			setBusy(false);
@@ -122,7 +123,8 @@ export default function LoginScreen() {
 							</View>
 						) : null}
 						<PrimaryButton
-							title="Sign in"
+							title={busy ? "Signing in…" : "Sign in"}
+							disabled={busy}
 							icon="arrow-forward"
 							onPress={handleSignIn}
 						/>
