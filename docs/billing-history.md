@@ -1,6 +1,6 @@
 # Billing History (BE-313)
 
-Implements Figma mobile v2 History frames `232:861` and `232:860` in `src/screens/BillingHistoryScreen.tsx`. History opens automatically after sign-in or restoration of an existing app session. `/history` requires a signed-in session. Main’s new `/home` and `/dashboard` routes are preserved.
+Implements Figma mobile v2 History frames `232:861` and `232:860` in `src/screens/BillingHistoryScreen.tsx`. History opens automatically after sign-in or restoration of an existing app session. `/history` requires a signed-in session. The tenant Home dashboard is available at `/home` and `/dashboard`; its bill links open the protected `/bill/[billId]` details route.
 
 ## Included
 
@@ -10,6 +10,7 @@ Implements Figma mobile v2 History frames `232:861` and `232:860` in `src/screen
 - Year and payment-status filters, with clear filters, loading, retry, empty, no-match, refresh, timeout, and invalid-response handling.
 - Safe areas, scrollable list, accessible control labels/states, and responsive phone/tablet width.
 - Local Figma navigation assets and bundled Inter Regular/Bold fonts.
+- Home dashboard with the current outstanding bill, monthly totals, and an explicit no-room-assigned prompt. Bill Details shows the rent/utility breakdown, recorded payments, and outstanding balance.
 
 ## Backend integration
 
@@ -36,7 +37,15 @@ Response (the backend returns decimal strings; the parser also accepts JSON numb
       "outstandingBalance": "2350.00",
       "dueDate": "2026-10-10",
       "settledDate": null,
-      "status": "partial"
+      "status": "partial",
+      "payments": [
+        {
+          "paymentId": "<payment UUID>",
+          "amount": "3000.00",
+          "paymentDate": "2026-10-03",
+          "recordedBy": "Elena Dela Cruz"
+        }
+      ]
     }
   ]
 }
@@ -48,9 +57,9 @@ The server must derive tenant scope from the authenticated user, validate tenant
 
 ## Teammate handoff
 
-`BillingHistoryScreen` accepts `onBillPress(billId)`. Once the Bill details route is agreed, wire it in `src/app/history.tsx` with Expo Router, passing the selected bill ID. Until then, selecting a bill explains that details are unavailable; no competing Bill details screen has been created.
+History rows and the Home dashboard navigate to the authenticated bill details route with the selected bill ID.
 
-The old test Home was removed. Home is disabled until the real screen is built; the new Dashboard from main remains available at `/home` and `/dashboard`. The shared Account tab opens a temporary profile screen containing Sign out. A successful sign-up with an immediate session notifies the app route guard through the shared Supabase sign-in flow and opens History; accounts requiring email confirmation show confirmation instructions and a Continue to sign in action.
+The shared Account tab opens the tenant profile screen. A successful sign-up with an immediate session notifies the app route guard through the shared Supabase sign-in flow and opens History; accounts requiring email confirmation show confirmation instructions and a Continue to sign in action.
 
 ## Development preview
 

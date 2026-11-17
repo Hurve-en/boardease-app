@@ -43,6 +43,7 @@ export default function RootLayout() {
 				<Stack.Screen name="account" />
 				<Stack.Screen name="home" />
 				<Stack.Screen name="dashboard" />
+				<Stack.Screen name="bill/[billId]" />
 			</Stack.Protected>
 
 			<Stack.Protected guard={!signedIn}>

@@ -20,11 +20,11 @@ export async function fetchBillingHistory(signal: AbortSignal) {
     const problem = await response.json().catch(() => null);
     if (problem?.code === "TENANT_NOT_LINKED") {
       throw new Error(
-        "Your account isn’t linked to a tenant record yet. Please contact your owner.",
+        "Your tenant account isn’t set up yet. Ask your owner to link your tenant record and assign your room.",
       );
     }
     throw new Error(
-      "Your account cannot access billing history. Please contact your owner.",
+      "Your tenant role may not be set up yet. Ask your owner to confirm your role and room assignment.",
     );
   }
   if (response.status === 404 || response.status === 501)

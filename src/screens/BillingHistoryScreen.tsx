@@ -28,10 +28,10 @@ import {
   useFonts,
 } from "@expo-google-fonts/inter";
 import { StatusBar } from "expo-status-bar";
+import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   Platform,
   Pressable,
@@ -144,10 +144,7 @@ export default function BillingHistoryScreen({ onBillPress }: Props) {
         onBillPress(billId);
         return;
       }
-      const message =
-        "Bill details are not available yet. Please check back later.";
-      if (Platform.OS === "web") window.alert(message);
-      else Alert.alert("Bill details", message);
+      router.push({ pathname: "/bill/[billId]", params: { billId } });
     },
     [onBillPress],
   );

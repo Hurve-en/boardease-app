@@ -12,6 +12,14 @@ export type HistoryBill = {
   dueDate: string;
   settledDate: string | null;
   status: BillStatus;
+  payments?: RecordedPayment[];
+};
+
+export type RecordedPayment = {
+  paymentId: string;
+  amount: number;
+  paymentDate: string;
+  recordedBy: string | null;
 };
 
 export type BillingHistory = {
@@ -99,11 +107,22 @@ export function parseBillingHistory(value: unknown): BillingHistory {
     const bill = object(value);
     const status = bill.status;
     if (status !== "paid" && status !== "partial" && status !== "unpaid") throw new Error("Invalid bill status.");
+    const rawPayments = bill.payments;
+    if (rawPayments != null && !Array.isArray(rawPayments)) throw new Error("Invalid bill payments.");
+    const payments = (rawPayments ?? []).map((entry) => {
+      const payment = object(entry);
+      return {
+        paymentId: requiredString(payment.paymentId),
+        amount: money(payment.amount),
+        paymentDate: date(payment.paymentDate),
+        recordedBy: optionalString(payment.recordedBy),
+      };
+    });
     const result: HistoryBill = {
       billId: requiredString(bill.billId), billingMonth: date(bill.billingMonth),
       totalAmount: money(bill.totalAmount), electricCharge: money(bill.electricCharge),
       waterCharge: money(bill.waterCharge), outstandingBalance: money(bill.outstandingBalance),
-      dueDate: date(bill.dueDate), settledDate: bill.settledDate == null ? null : date(bill.settledDate), status,
+      dueDate: date(bill.dueDate), settledDate: bill.settledDate == null ? null : date(bill.settledDate), status, payments,
     };
     if (result.billingMonth.slice(8) !== "01" || ids.has(result.billId) || months.has(result.billingMonth) ||
         result.outstandingBalance > result.totalAmount ||

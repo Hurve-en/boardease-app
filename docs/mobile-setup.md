@@ -29,9 +29,9 @@ Use `npm run android`, `npm run ios`, or `npm run web` to open a particular plat
 
 ## API configuration
 
-`EXPO_PUBLIC_API_URL` is the backend origin without `/api`, for example `http://192.168.1.100:3000`. Replace the example IP with the computer running Next.js and make that server reachable on the local network. Registration and login currently use Supabase Auth directly.
+`EXPO_PUBLIC_API_URL` is the backend origin without `/api`, for example `http://192.168.1.100:3001`. Replace the example IP with the computer running Next.js and make that server reachable on the local network. Registration and login currently use Supabase Auth directly.
 
-A physical phone's `localhost` points to the phone, so use the computer's LAN IP. For the standard Android emulator, the host computer is available at `http://10.0.2.2:3000`. The iOS simulator and local web browser can use `http://localhost:3000`.
+A physical phone's `localhost` points to the phone, so use the computer's LAN IP. For the standard Android emulator, the host computer is available at `http://10.0.2.2:3001`. The iOS simulator and local web browser can use `http://localhost:3001`.
 
 The backend data connection uses:
 
