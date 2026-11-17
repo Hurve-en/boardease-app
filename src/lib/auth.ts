@@ -43,6 +43,10 @@ export async function hasSession() {
 	return (await getItem(ACCESS_KEY)) !== null;
 }
 
+export function getAccessToken() {
+	return getItem(ACCESS_KEY);
+}
+
 async function callLogout(accessToken: string, refreshToken: string) {
 	if (!API) return;
 

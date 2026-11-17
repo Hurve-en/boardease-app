@@ -37,6 +37,8 @@ export default function RootLayout() {
 	return (
 		<Stack screenOptions={{headerShown: false}}>
 			<Stack.Protected guard={signedIn}>
+				<Stack.Screen name="history" />
+				<Stack.Screen name="account" />
 				<Stack.Screen name="home" />
 			</Stack.Protected>
 

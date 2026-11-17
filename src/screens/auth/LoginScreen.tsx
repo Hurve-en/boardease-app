@@ -52,7 +52,7 @@ export default function LoginScreen() {
 				return;
 			}
 
-			router.replace("/home");
+			router.replace("/history");
 		} catch {
 			setProblem("Failed to sign in. Please check your credentials.");
 		} finally {

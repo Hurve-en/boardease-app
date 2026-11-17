@@ -1,6 +1,7 @@
 import { colors } from "@/constants/theme";
 import { supabase } from "@/lib/supabase";
-import { Link } from "expo-router";
+import { signIn } from "@/lib/auth";
+import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -23,9 +24,14 @@ export default function RegisterScreen() {
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState("");
   const [notice, setNotice] = useState("");
+  const [created, setCreated] = useState(false);
 
   async function submit() {
     if (busy) return;
+    if (created) {
+      router.replace("/login");
+      return;
+    }
     setProblem("");
     setNotice("");
 
@@ -60,11 +66,21 @@ export default function RegisterScreen() {
         return;
       }
 
-      setNotice(
-        data.session
-          ? "Account created successfully."
-          : "Check your email for a confirmation link.",
-      );
+      setCreated(true);
+      setPassword("");
+      setConfirm("");
+      if (data.session) {
+        // Establish the same tenant-validated API session used by normal sign-in.
+        const signInError = await signIn(email, password);
+        if (!signInError) {
+          router.replace("/history");
+          return;
+        }
+        setProblem(signInError);
+        setNotice("Your account was created. Please sign in to continue.");
+      } else {
+        setNotice("Check your email for a confirmation link, then sign in to continue.");
+      }
     } catch {
       setProblem("Sign up failed. Please try again.");
     } finally {
@@ -144,7 +160,7 @@ export default function RegisterScreen() {
           ) : null}
 
           <PrimaryButton
-            title={busy ? "Creating account…" : "Create account"}
+            title={busy ? "Creating account…" : created ? "Continue to sign in" : "Create account"}
             disabled={busy}
             icon="arrow-forward"
             onPress={submit}
