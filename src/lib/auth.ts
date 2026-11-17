@@ -13,9 +13,9 @@ export function onAuthChange(fn: Listener) {
 
 export async function hasSession() {
 	if (!supabase) return false;
-	const {data, error} = await supabase.auth.getSession();
+	const {data, error} = await supabase.auth.getUser();
 	if (error) throw error;
-	return data.session !== null;
+	return data.user !== null;
 }
 
 // Returns an error message, or null on success.

@@ -38,6 +38,7 @@ export default function RootLayout() {
 		<Stack screenOptions={{headerShown: false}}>
 			<Stack.Protected guard={signedIn}>
 				<Stack.Screen name="home" />
+				<Stack.Screen name="dashboard" />
 			</Stack.Protected>
 
 			<Stack.Protected guard={!signedIn}>
