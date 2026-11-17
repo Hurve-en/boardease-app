@@ -8,10 +8,10 @@ This repository is the BoardEase tenant app. It already uses Expo SDK 58, React 
 | --- | --- |
 | `src/app/` | Route entry points and protected navigation layout. |
 | `src/screens/auth/` | Login and registration screens. |
-| `src/screens/HomeScreen.tsx` | Tenant home screen. |
+| `src/screens/DashboardScreen.tsx` | Dashboard from main; routes `/home` and `/dashboard`. |
 | `src/components/auth/` | Auth-specific header and logo. |
 | `src/components/ui/` | Reusable button and text field. |
-| `src/lib/` | API authentication, token storage, and Supabase client. |
+| `src/lib/` | Shared Supabase authentication and authenticated backend API clients. |
 | `src/constants/theme.ts` | Shared app color palette. |
 | `assets/` | App icons and splash assets. |
 | `docs/images/` | Project diagrams and documentation images. |
@@ -48,11 +48,11 @@ The registration and login screens use `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBL
 
 - `/` redirects signed-out users to `/login`.
 - `/login` links to `/register`; registration links back to login.
-- `/home` is protected by the stored-session check. Successful tenant login opens it.
-- Logout clears local tokens and returns to login through the route guard.
+- `/history` opens after sign-in or restoration of a valid Supabase session. History, Account, Home, and Dashboard are protected routes.
+- Account sign-out clears the current Supabase session and returns to login through the route guard; failures are shown before navigating.
 - During session restoration, the app shows a loading indicator. A storage-read failure falls back to signed-out navigation.
 
-Native token storage uses SecureStore; web uses AsyncStorage. The route guard checks local token presence. Backend authorization and token validity checks remain server responsibilities; automatic token refresh is not introduced by this setup task.
+The shared Supabase client persists native sessions in AsyncStorage and web sessions in localStorage, with automatic token refresh enabled. The route guard validates users with Supabase `getUser()`. Backend API requests use the current Supabase access token; tenant data authorization remains enforced by the backend.
 
 ## Verification
 
@@ -71,8 +71,8 @@ Device smoke test with a running backend and test accounts:
 - Cold start while signed out: login opens; registration opens and returns to login.
 - Attempt to open `/home` while signed out: the protected screen is unavailable.
 - Invalid credentials or unreachable backend: an error appears and submission becomes available again.
-- Valid tenant credentials: Tenant Home opens; restarting the app restores access from stored tokens.
-- Admin credentials: the mobile app rejects access.
-- Logout: login opens, and back navigation cannot reopen Tenant Home. Repeat with the backend offline.
+- Valid tenant credentials: Billing History opens; restarting the app restores access from stored tokens.
+- Backend authorization rejects tenant-billing access for accounts without the required tenant role.
+- Logout: login opens, and back navigation cannot reopen protected screens. Repeat with the backend offline.
 
 Automated checks do not replace this device test. See the saved project context for the latest verification results and remaining limitations.

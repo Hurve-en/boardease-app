@@ -18,6 +18,14 @@ export async function hasSession() {
 	return data.user !== null;
 }
 
+// Use the same persisted/refreshed Supabase session as the dashboard API client.
+export async function getAccessToken() {
+	if (!supabase) return null;
+	const {data, error} = await supabase.auth.getSession();
+	if (error) throw error;
+	return data.session?.access_token ?? null;
+}
+
 // Returns an error message, or null on success.
 export async function signIn(email: string, password: string) {
 	if (!supabase) {
@@ -39,7 +47,8 @@ export async function signIn(email: string, password: string) {
 
 export async function signOut() {
 	if (supabase) {
-		await supabase.auth.signOut();
+		const {error} = await supabase.auth.signOut({scope: "local"});
+		if (error) throw error;
 	}
 	notify(false);
 }
