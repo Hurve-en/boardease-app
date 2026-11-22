@@ -56,6 +56,15 @@ The shared Supabase client persists native sessions in AsyncStorage and web sess
 
 ## Verification
 
+If TypeScript reports `TS2322` for an existing route such as `/bill/[billId]` or `/payment-submission/[billId]`, the local Expo route declarations may be stale after pulling route changes. Refresh them before checking types:
+
+```sh
+npx expo customize tsconfig.json
+npm run typecheck
+```
+
+Expo also regenerates these declarations when `npm start` starts the development server. Keep `.expo/` ignored by Git and preserve typed navigation calls; do not add type casts to suppress these errors. See [Expo typed routes](https://docs.expo.dev/router/reference/typed-routes/).
+
 Run these before submitting changes:
 
 ```sh
