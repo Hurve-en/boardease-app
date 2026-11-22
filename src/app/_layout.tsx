@@ -1,7 +1,7 @@
-import {hasSession, onAuthChange} from "@/lib/auth";
-import {Stack} from "expo-router";
-import {useEffect, useState} from "react";
-import {ActivityIndicator, View} from "react-native";
+import { hasSession, onAuthChange } from "@/lib/auth";
+import { Stack } from "expo-router";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, View } from "react-native";
 
 export const unstable_settings = {anchor: "history"};
 
@@ -44,6 +44,7 @@ export default function RootLayout() {
 				<Stack.Screen name="home" />
 				<Stack.Screen name="dashboard" />
 				<Stack.Screen name="bill/[billId]" />
+				<Stack.Screen name="payment-submission/[billId]" />
 			</Stack.Protected>
 
 			<Stack.Protected guard={!signedIn}>

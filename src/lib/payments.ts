@@ -14,6 +14,7 @@ export async function submitPayment(
         billId: string;
         amount: number;
         referenceNumber: string;
+        paymentDate: string;
     },
     receipt: ImagePicker.ImagePickerAsset,
 ){
