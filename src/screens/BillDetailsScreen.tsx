@@ -1,9 +1,9 @@
 import { fetchBillingHistory } from "@/features/billing-history/api";
 import { billMonthLabel, formatMoney, statusLabels, type BillingHistory, type HistoryBill } from "@/features/billing-history/model";
 import { historyColors as c, historyFonts as f } from "@/features/billing-history/theme";
-import { router, useLocalSearchParams } from "expo-router";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { Inter_400Regular, Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -63,6 +63,22 @@ export default function BillDetailsScreen() {
           <MoneyRow label="Payments recorded" value={`− ${formatMoney(paid)}`} />
           <View style={s.balance}><Text style={s.balanceLabel}>OUTSTANDING BALANCE</Text><Text style={s.balanceAmount}>{formatMoney(bill.outstandingBalance)}</Text><Text style={s.balanceDue}>Due {formatDate(bill.dueDate)}</Text></View>
         </View>
+
+        {bill.outstandingBalance > 0 ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() =>
+              router.push({
+                pathname: "/payment-submission/[billId]",
+                params: { billId: bill.billId },
+              })
+            }
+            style={s.submitPaymentButton}
+          >
+            <Text style={s.submitPaymentButtonText}>Submit payment proof</Text>
+          </Pressable>
+        ) : null}
+
         <Text style={s.sectionTitle}>Recorded payments</Text>
         {bill.payments?.length ? bill.payments.map((payment) => (
           <View style={s.paymentCard} key={payment.paymentId}>
@@ -91,4 +107,6 @@ const s = StyleSheet.create({
   sectionTitle: { fontFamily: f.bold, fontSize: 16, color: c.text, marginTop: 22, marginBottom: 10 }, paymentCard: { backgroundColor: c.white, borderWidth: 1, borderColor: c.border, borderRadius: 14, padding: 15, marginBottom: 9 }, paymentTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, paymentAmount: { fontFamily: f.bold, fontSize: 18, color: c.text }, paymentMeta: { fontFamily: f.regular, fontSize: 12, color: c.muted, marginTop: 8 },
   footerNote: { flexDirection: "row", alignItems: "flex-start", gap: 8, marginTop: 15 }, footerText: { flex: 1, fontFamily: f.regular, fontSize: 12, color: c.muted, lineHeight: 18 },
   notice: { margin: 22, padding: 18, borderRadius: 14, backgroundColor: c.white, gap: 9 }, muted: { fontFamily: f.regular, fontSize: 13, color: c.muted, lineHeight: 19 }, retry: { alignSelf: "flex-start", paddingHorizontal: 16, paddingVertical: 12, backgroundColor: c.brown, borderRadius: 8 }, retryText: { fontFamily: f.bold, color: c.white, fontSize: 13 }, roomNotice: { flexDirection: "row", alignItems: "flex-start", gap: 8, padding: 13, marginBottom: 13, backgroundColor: c.beige, borderRadius: 11 },
+  submitPaymentButton: { marginTop: 16, minHeight: 48, alignItems: "center", justifyContent: "center", borderRadius: 12, backgroundColor: c.brown },
+  submitPaymentButtonText: { fontFamily: f.bold, color: c.white, fontSize: 14 },
 });
