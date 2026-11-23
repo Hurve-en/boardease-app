@@ -1,5 +1,7 @@
 import { TenantTabBar } from "@/components/navigation/TenantTabBar";
-import { AccountSessionError, fetchAccount } from "@/features/account/api";
+import { AccountSessionError, fetchAccount, saveProfileName } from "@/features/account/api";
+import { requestEmailChange } from "@/features/account/email";
+import { SecurityForm, securityStyles } from "@/features/account/SecurityForm";
 import { ChangePasswordForm } from "@/features/account/ChangePasswordForm";
 import { ownerContacts, type TenantAccount } from "@/features/account/model";
 import { HistoryIcon } from "@/features/billing-history/HistoryIcon";
@@ -26,6 +28,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -46,6 +49,15 @@ export default function AccountScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showContacts, setShowContacts] = useState(false);
   const [passwordSaved, setPasswordSaved] = useState(false);
+  const [draftName, setDraftName] = useState<string | null>(null);
+  const [savingName, setSavingName] = useState(false);
+  const [nameError, setNameError] = useState("");
+  const saving = useRef(false);
+  const [emailDraft, setEmailDraft] = useState<string | null>(null);
+  const [emailBusy, setEmailBusy] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [requestedEmail, setRequestedEmail] = useState("");
+  const sendingEmail = useRef(false);
   const signingOut = useRef(false);
 
   useEffect(() => {
@@ -86,8 +98,45 @@ export default function AccountScreen() {
     };
   }, [attempt]);
 
+  async function saveName() {
+    const name = draftName?.trim();
+    if (!name) { setNameError("Enter your display name."); return; }
+    if (saving.current) return;
+    saving.current = true;
+    setSavingName(true);
+    setNameError("");
+    try {
+      const saved = await saveProfileName(name);
+      setData(account => account && {...account, profile: {...account.profile, name: saved}});
+      setDraftName(null);
+    } catch (error) {
+      setNameError(error instanceof AccountSessionError ? error.message : "Couldn’t save your display name. Please try again.");
+    } finally {
+      saving.current = false;
+      setSavingName(false);
+    }
+  }
+
+  async function submitEmail() {
+    if (!data || emailDraft === null || sendingEmail.current) return;
+    sendingEmail.current = true;
+    setEmailBusy(true);
+    setEmailError("");
+    try {
+      const { email, confirmed } = await requestEmailChange(data.profile.email, emailDraft);
+      setEmailDraft(null);
+      setRequestedEmail(email);
+      if (confirmed) setAttempt(value => value + 1);
+    } catch (error) {
+      setEmailError(error instanceof Error ? error.message : "Couldn’t request the email change.");
+    } finally {
+      sendingEmail.current = false;
+      setEmailBusy(false);
+    }
+  }
+
   async function handleSignOut() {
-    if (signingOut.current || passwordBusy) return;
+    if (signingOut.current || passwordBusy || sendingEmail.current) return;
     signingOut.current = true;
     setBusy(true);
     setActionError("");
@@ -111,7 +160,7 @@ export default function AccountScreen() {
     }
   }
   function refresh() {
-    if (!loading && !passwordBusy && !busy) {
+    if (!loading && !passwordBusy && !busy && draftName === null && emailDraft === null) {
       setLoading(true);
       setLoadError("");
       setAttempt((value) => value + 1);
@@ -119,7 +168,7 @@ export default function AccountScreen() {
   }
   const contacts = ownerContacts(data?.owner ?? null);
   const avatar = data ? initials(data.profile.name) : "";
-  const disabled = busy || passwordBusy;
+  const disabled = busy || passwordBusy || savingName || emailBusy;
 
   if (!fontsLoaded && !fontError)
     return (
@@ -146,7 +195,7 @@ export default function AccountScreen() {
             <RefreshControl
               refreshing={loading && data !== null}
               onRefresh={refresh}
-              enabled={!disabled}
+              enabled={!disabled && draftName === null && emailDraft === null}
               tintColor={c.brown}
             />
           }
@@ -200,6 +249,22 @@ export default function AccountScreen() {
                   </Text>
                 </View>
               </View>
+              {draftName === null ? (
+                <Action label="Edit account" disabled={disabled || loading || showPassword || emailDraft !== null} onPress={() => {
+                  setNameError("");
+                  setDraftName(data.profile.name);
+                }} />
+              ) : (
+                <View style={styles.card}>
+                  <Text style={styles.cardTitle}>Display name</Text>
+                  <TextInput accessibilityLabel="Display name" style={styles.nameInput}
+                    value={draftName} onChangeText={setDraftName} maxLength={120}
+                    editable={!savingName} autoCapitalize="words" />
+                  {nameError ? <Text accessibilityRole="alert" style={styles.actionError}>{nameError}</Text> : null}
+                  <Action label={savingName ? "Saving…" : "Save changes"} disabled={savingName} onPress={saveName} />
+                  <Action label="Cancel" disabled={savingName} onPress={() => setDraftName(null)} />
+                </View>
+              )}
               <Text accessibilityRole="header" style={styles.sectionTitle}>
                 Your boarding house
               </Text>
@@ -267,25 +332,51 @@ export default function AccountScreen() {
           <Text accessibilityRole="header" style={styles.sectionTitle}>
             Security
           </Text>
-          <Action
-            label="Change password"
-            chevron
-            disabled={disabled || sessionExpired || loading}
-            expanded={showPassword}
-            onPress={() => {
-              setShowPassword((value) => !value);
-              setPasswordSaved(false);
-            }}
-          />
-          {showPassword ? (
-            <ChangePasswordForm
-              onBusyChange={setPasswordBusy}
-              onClose={(success) => {
-                setShowPassword(false);
-                setPasswordSaved(!!success);
+          {data && (
+            <Action label="Change email" chevron expanded={emailDraft !== null}
+              disabled={disabled || loading || showPassword || draftName !== null}
+              onPress={() => { setEmailError(""); setEmailDraft(value => value === null ? "" : null); }} />
+          )}
+          {data && emailDraft !== null && (
+            <SecurityForm busy={emailBusy} error={emailError} onSubmit={submitEmail}
+              onCancel={() => setEmailDraft(null)} submitLabel={emailBusy ? "Sending…" : "Request email change"}
+              description="Enter your new sign-in email. Check your inboxes for confirmation instructions.">
+              <View style={securityStyles.field}>
+                <Text style={securityStyles.label}>New sign-in email</Text>
+                <TextInput accessibilityLabel="New sign-in email" style={securityStyles.input}
+                  value={emailDraft} onChangeText={setEmailDraft} autoCapitalize="none"
+                  keyboardType="email-address" autoCorrect={false} editable={!emailBusy} />
+              </View>
+            </SecurityForm>
+          )}
+          {data && requestedEmail && emailDraft === null ? (
+            <Text accessibilityRole="alert" style={styles.success}>
+              {data.profile.email.toLowerCase() === requestedEmail
+                ? "Your sign-in email has been updated."
+                : "Check your inboxes for confirmation instructions, then refresh Account."}
+            </Text>
+          ) : null}
+          <View style={styles.securityRow}>
+            <Action
+              label="Change password"
+              chevron
+              disabled={disabled || sessionExpired || loading || draftName !== null || emailDraft !== null}
+              expanded={showPassword}
+              onPress={() => {
+                setShowPassword((value) => !value);
+                setPasswordSaved(false);
               }}
             />
-          ) : null}
+            {showPassword ? (
+              <ChangePasswordForm
+                onBusyChange={setPasswordBusy}
+                onClose={(success) => {
+                  setShowPassword(false);
+                  setPasswordSaved(!!success);
+                }}
+              />
+            ) : null}
+          </View>
           {passwordSaved ? (
             <Text accessibilityRole="alert" style={styles.success}>
               Your password has been changed.
@@ -306,7 +397,7 @@ export default function AccountScreen() {
           {Platform.OS === "web" && data ? (
             <Pressable
               accessibilityRole="button"
-              disabled={disabled || loading}
+              disabled={disabled || loading || draftName !== null || emailDraft !== null}
               onPress={refresh}
               style={styles.refresh}
             >
@@ -425,6 +516,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   avatarText: { fontFamily: f.bold, fontSize: 13, color: c.brown },
+  nameInput: { minHeight: 48, borderWidth: 1, borderColor: c.border, borderRadius: 8, paddingHorizontal: 12, color: c.text },
   profileText: { flex: 1, gap: 4 },
   profileName: { fontFamily: f.bold, fontSize: 17, color: c.text },
   card: {
@@ -443,6 +535,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     flexShrink: 1,
   },
+  securityRow: { marginTop: 12 },
   sectionTitle: {
     fontFamily: f.bold,
     fontSize: 17,

@@ -115,3 +115,22 @@ test('password transport failures do not report success or attempt a save after 
   await assert.rejects(service.changePassword('old-pass','new-pass'), /Network request failed/);
   assert.equal(updates,1);
 });
+
+test('email changes validate input and distinguish a pending address from a confirmed one', async () => {
+  const requests = [];
+  let verified = 'current@example.test';
+  const {requestEmailChange} = moduleAt('../src/features/account/email.ts', {
+    '@/lib/supabase': {supabase: {auth: {updateUser: async input => {
+      requests.push(JSON.parse(JSON.stringify(input)));
+      return {data: {user: {email: verified}}, error: null};
+    }}}},
+  });
+  for (const value of ['invalid', ' CURRENT@example.test ']) {
+    await assert.rejects(requestEmailChange(verified, value));
+  }
+  assert.equal(requests.length, 0);
+  assert.equal((await requestEmailChange(verified, ' Next@example.test ')).confirmed, false);
+  assert.deepEqual(requests[0], {email: 'next@example.test'});
+  verified = 'next@example.test';
+  assert.equal((await requestEmailChange('current@example.test', verified)).confirmed, true);
+});
