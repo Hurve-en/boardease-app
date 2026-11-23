@@ -1,6 +1,6 @@
  <div align="center">
 
-<img src="docs/images/BoardEase.png" alt="BoardEase Logo" width="200" />
+<img src="docs/images/BoardEaselogo.png" alt="BoardEase Logo" width="200" />
 
 # BoardEase
 
