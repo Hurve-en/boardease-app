@@ -1,4 +1,4 @@
-import { hasSession, onAuthChange } from "@/lib/auth";
+import { getAuthState, onAuthChange, type UserRole } from "@/lib/auth";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
@@ -6,22 +6,25 @@ import { ActivityIndicator, View } from "react-native";
 export const unstable_settings = {anchor: "history"};
 
 export default function RootLayout() {
-	const [signedIn, setSignedIn] = useState(false);
+	const [authState, setAuthState] = useState<{
+		signedIn: boolean;
+		role: UserRole | null;
+	}>({signedIn: false, role: null});
 	const [ready, setReady] = useState(false);
 
 	useEffect(() => {
 		let active = true;
-		hasSession()
-			.then((value) => {
-				if (active) setSignedIn(value);
+		getAuthState()
+			.then((state) => {
+				if (active) setAuthState(state);
 			})
 			.catch(() => {
-				if (active) setSignedIn(false);
+				if (active) setAuthState({signedIn: false, role: null});
 			})
 			.finally(() => {
 				if (active) setReady(true);
 			});
-		const unsubscribe = onAuthChange(setSignedIn);
+		const unsubscribe = onAuthChange(setAuthState);
 		return () => {
 			active = false;
 			unsubscribe();
@@ -38,7 +41,12 @@ export default function RootLayout() {
 
 	return (
 		<Stack screenOptions={{headerShown: false}}>
-			<Stack.Protected guard={signedIn}>
+			<Stack.Protected guard={authState.signedIn && authState.role === "admin"}>
+				<Stack.Screen name="admin" />
+				<Stack.Screen name="admin-payments" />
+			</Stack.Protected>
+
+			<Stack.Protected guard={authState.signedIn && authState.role !== "admin"}>
 				<Stack.Screen name="history" />
 				<Stack.Screen name="account" />
 				<Stack.Screen name="home" />
@@ -47,7 +55,7 @@ export default function RootLayout() {
 				<Stack.Screen name="payment-submission/[billId]" />
 			</Stack.Protected>
 
-			<Stack.Protected guard={!signedIn}>
+			<Stack.Protected guard={!authState.signedIn}>
 				<Stack.Screen name="index" />
 				<Stack.Screen name="login" />
 				<Stack.Screen name="register" />

@@ -1,8 +1,11 @@
 import {supabase} from "./supabase";
 
-type Listener = (signedIn: boolean) => void;
+export type UserRole = "admin" | "tenant";
+export type AuthState = {signedIn: boolean; role: UserRole | null};
+
+type Listener = (state: AuthState) => void;
 const listeners = new Set<Listener>();
-const notify = (signedIn: boolean) => listeners.forEach((fn) => fn(signedIn));
+const notify = (state: AuthState) => listeners.forEach((fn) => fn(state));
 
 export function onAuthChange(fn: Listener) {
 	listeners.add(fn);
@@ -11,11 +14,26 @@ export function onAuthChange(fn: Listener) {
 	};
 }
 
-export async function hasSession() {
-	if (!supabase) return false;
+export async function getAuthState(): Promise<AuthState> {
+	if (!supabase) return {signedIn: false, role: null};
 	const {data, error} = await supabase.auth.getUser();
 	if (error) throw error;
-	return data.user !== null;
+	if (!data.user) return {signedIn: false, role: null};
+	return {signedIn: true, role: await getUserRole()};
+}
+
+export async function hasSession() {
+	const state = await getAuthState();
+	return state.signedIn;
+}
+
+export async function getUserRole(): Promise<UserRole> {
+	if (!supabase) return "tenant";
+	const {data, error} = await supabase.auth.getClaims();
+	if (error) throw error;
+	const role = (data?.claims as {user_role?: string | null} | undefined)
+		?.user_role;
+	return role === "admin" ? "admin" : "tenant";
 }
 
 // Use the same persisted/refreshed Supabase session as the dashboard API client.
@@ -38,7 +56,8 @@ export async function signIn(email: string, password: string) {
 			password,
 		});
 		if (error) return error.message;
-		notify(true);
+		const role = await getUserRole();
+		notify({signedIn: true, role});
 		return null;
 	} catch {
 		return "Can't reach the authentication service.";
@@ -50,5 +69,5 @@ export async function signOut() {
 		const {error} = await supabase.auth.signOut({scope: "local"});
 		if (error) throw error;
 	}
-	notify(false);
+	notify({signedIn: false, role: null});
 }

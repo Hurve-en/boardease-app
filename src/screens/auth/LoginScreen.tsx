@@ -1,5 +1,5 @@
 import {colors} from "@/constants/theme";
-import {signIn} from "@/lib/auth";
+import {getUserRole, signIn} from "@/lib/auth";
 import {useRouter} from "expo-router";
 import {useState} from "react";
 import {
@@ -52,7 +52,8 @@ export default function LoginScreen() {
 				return;
 			}
 
-			router.replace("/history");
+			const role = await getUserRole();
+			router.replace(role === "admin" ? "/admin" : "/history");
 		} catch {
 			setProblem("Failed to sign in. Please check your credentials.");
 		} finally {
