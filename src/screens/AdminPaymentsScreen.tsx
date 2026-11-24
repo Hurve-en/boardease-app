@@ -1,4 +1,5 @@
 import {AdminTabBar} from "@/components/navigation/AdminTabBar";
+import {AdminScreenHeader} from "@/components/navigation/AdminScreenHeader";
 import {
   approvePaymentSubmission,
   fetchAdminPayments,
@@ -228,15 +229,7 @@ export default function AdminPaymentsScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.eyebrow}>BOARDEASE ADMIN</Text>
-            <Text style={styles.title}>Payments</Text>
-          </View>
-          <Pressable accessibilityRole="button" accessibilityLabel="Refresh payments" onPress={retry} style={({pressed}) => [styles.refresh, pressed && styles.pressed]}>
-            <Ionicons name="refresh-outline" size={20} color={c.brown} />
-          </Pressable>
-        </View>
+        <AdminScreenHeader title="Payments" onRefresh={retry} refreshing={loading} />
 
         <View style={styles.monthRow}>
           <Pressable accessibilityRole="button" accessibilityLabel="Previous month" onPress={() => changeMonth(shiftMonth(month, -1))} style={styles.monthButton}>
@@ -421,11 +414,8 @@ export default function AdminPaymentsScreen() {
 const styles = StyleSheet.create({
   safe: {flex: 1, backgroundColor: c.background},
   loading: {flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: c.background},
-  content: {flexGrow: 1, width: "100%", maxWidth: 600, alignSelf: "center", padding: 20, paddingBottom: 28},
-  header: {flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 18},
-  eyebrow: {fontFamily: f.bold, fontSize: 11, letterSpacing: 1.4, color: c.muted},
-  title: {fontFamily: f.bold, fontSize: 26, color: c.text, marginTop: 4},
-  refresh: {width: 42, height: 42, borderRadius: 21, alignItems: "center", justifyContent: "center", backgroundColor: c.beige},
+  content: {flexGrow: 1, width: "100%", maxWidth: 600, alignSelf: "center", paddingHorizontal: 20, paddingTop: 8, paddingBottom: 28},
+  eyebrow: {fontFamily: f.bold, fontSize: 10, letterSpacing: 1, color: c.muted},
   pressed: {opacity: 0.68},
   monthRow: {flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 14},
   monthButton: {width: 38, height: 38, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: c.white, borderWidth: 1, borderColor: c.border},

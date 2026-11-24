@@ -1,6 +1,6 @@
 import {historyColors as c, historyFonts as f} from "@/features/billing-history/theme";
+import {HistoryIcon} from "@/features/billing-history/HistoryIcon";
 import {signOut} from "@/lib/auth";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import {router} from "expo-router";
 import {useState} from "react";
 import {Pressable, StyleSheet, Text, View} from "react-native";
@@ -35,7 +35,7 @@ export function AdminTabBar({active}: {active: "dashboard" | "payments"}) {
             style={({pressed}) => [styles.tab, pressed && styles.pressed]}
           >
             <View style={[styles.icon, active === "dashboard" && styles.selected]}>
-              <Ionicons name="grid-outline" size={18} color={active === "dashboard" ? c.brown : c.muted} />
+              <HistoryIcon name="home" />
             </View>
             <Text style={[styles.label, active === "dashboard" && styles.selectedLabel]}>Dashboard</Text>
           </Pressable>
@@ -47,7 +47,7 @@ export function AdminTabBar({active}: {active: "dashboard" | "payments"}) {
             style={({pressed}) => [styles.tab, pressed && styles.pressed]}
           >
             <View style={[styles.icon, active === "payments" && styles.selected]}>
-              <Ionicons name="card-outline" size={18} color={active === "payments" ? c.brown : c.muted} />
+              <HistoryIcon name="history" />
             </View>
             <Text style={[styles.label, active === "payments" && styles.selectedLabel]}>Payments</Text>
           </Pressable>
@@ -61,7 +61,7 @@ export function AdminTabBar({active}: {active: "dashboard" | "payments"}) {
             style={({pressed}) => [styles.tab, pressed && styles.pressed]}
           >
             <View style={styles.icon}>
-              <Ionicons name="log-out-outline" size={18} color={c.muted} />
+              <HistoryIcon name="account" />
             </View>
             <Text style={styles.label}>{signingOut ? "Signing out…" : "Sign out"}</Text>
           </Pressable>

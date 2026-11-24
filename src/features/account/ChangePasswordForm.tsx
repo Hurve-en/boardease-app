@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
-import { Text, TextInput, View } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { SecurityForm, securityStyles as styles } from "./SecurityForm";
 import { passwordProblem } from "./model";
 import { changePassword } from "./password";
@@ -8,6 +9,7 @@ export function ChangePasswordForm({ onClose, onBusyChange }: { onClose: (succes
   const [current, setCurrent] = useState("");
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
+  const [visibleFields, setVisibleFields] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const submitting = useRef(false);
@@ -33,10 +35,23 @@ export function ChangePasswordForm({ onClose, onBusyChange }: { onClose: (succes
       { label: "Confirm new password", value: confirmation, change: setConfirmation, current: false },
     ].map(field => <View key={field.label} style={styles.field}>
       <Text style={styles.label}>{field.label}</Text>
-      <TextInput accessibilityLabel={field.label} value={field.value} onChangeText={field.change}
-        secureTextEntry autoCapitalize="none" autoCorrect={false} editable={!busy}
-        autoComplete={field.current ? "current-password" : "new-password"}
-        textContentType={field.current ? "password" : "newPassword"} style={styles.input} />
+      <View style={styles.passwordInputRow}>
+        <TextInput accessibilityLabel={field.label} value={field.value} onChangeText={field.change}
+          secureTextEntry={!visibleFields[field.label]} autoCapitalize="none" autoCorrect={false} editable={!busy}
+          autoComplete={field.current ? "current-password" : "new-password"}
+          textContentType={field.current ? "password" : "newPassword"} style={styles.passwordInput} />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${visibleFields[field.label] ? "Hide" : "Show"} ${field.label.toLowerCase()}`}
+          accessibilityState={{ disabled: busy }}
+          disabled={busy}
+          onPress={() => setVisibleFields((currentVisibility) => ({ ...currentVisibility, [field.label]: !currentVisibility[field.label] }))}
+          hitSlop={8}
+          style={({ pressed }) => [styles.visibilityButton, pressed && styles.pressed]}
+        >
+          <Ionicons name={visibleFields[field.label] ? "eye-off-outline" : "eye-outline"} size={20} color="#675C52" />
+        </Pressable>
+      </View>
     </View>)}
   </SecurityForm>;
 }

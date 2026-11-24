@@ -41,3 +41,4 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+docs/mobile-next-api-cheatsheet.md

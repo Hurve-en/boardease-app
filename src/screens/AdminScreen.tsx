@@ -1,6 +1,7 @@
 import { historyColors as c, historyFonts as f } from "@/features/billing-history/theme";
 import { fetchAdminDashboard, type AdminDashboardData } from "@/features/admin-dashboard/api";
 import { AdminTabBar } from "@/components/navigation/AdminTabBar";
+import { AdminScreenHeader } from "@/components/navigation/AdminScreenHeader";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Inter_400Regular, Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
 import { useEffect, useState } from "react";
@@ -56,20 +57,7 @@ export default function AdminScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.eyebrow}>BOARDEASE ADMIN</Text>
-            <Text style={styles.title}>Dashboard</Text>
-          </View>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Refresh dashboard"
-            onPress={retryDashboard}
-            style={({pressed}) => [styles.refresh, pressed && styles.pressed]}
-          >
-            <Ionicons name="refresh-outline" size={20} color={c.brown} />
-          </Pressable>
-        </View>
+        <AdminScreenHeader title="Dashboard" onRefresh={retryDashboard} refreshing={loading} />
 
         {loading ? (
           <View style={styles.state}>
@@ -149,26 +137,22 @@ export default function AdminScreen() {
 const styles = StyleSheet.create({
   safe: {flex: 1, backgroundColor: c.background},
   loading: {flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: c.background},
-  content: {flexGrow: 1, width: "100%", maxWidth: 600, alignSelf: "center", padding: 24, paddingBottom: 32},
-  header: {flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 24},
-  eyebrow: {fontFamily: f.bold, fontSize: 11, letterSpacing: 1.5, color: c.muted},
-  title: {marginTop: 4, fontFamily: f.bold, fontSize: 25, color: c.text},
-  refresh: {width: 42, height: 42, alignItems: "center", justifyContent: "center", borderRadius: 21, backgroundColor: c.beige},
+  content: {flexGrow: 1, width: "100%", maxWidth: 600, alignSelf: "center", paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32},
   pressed: {opacity: 0.65},
   sectionLabel: {fontFamily: f.bold, fontSize: 14, color: c.text, marginBottom: 10},
-  billingCard: {padding: 20, borderRadius: 18, backgroundColor: c.brown},
-  cardLabel: {fontFamily: f.regular, fontSize: 12, color: "#EAD9C9"},
-  total: {fontFamily: f.bold, fontSize: 30, color: c.white, marginTop: 7},
-  billingRow: {flexDirection: "row", justifyContent: "space-between", gap: 16, marginTop: 18, paddingTop: 14, borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.24)"},
-  billingLabel: {fontFamily: f.regular, fontSize: 11, color: "#EAD9C9"},
+  billingCard: {padding: 19, borderRadius: 16, backgroundColor: c.brown},
+  cardLabel: {fontFamily: f.regular, fontSize: 13, color: "#EAD9C9"},
+  total: {fontFamily: f.bold, fontSize: 32, color: c.white, marginTop: 7},
+  billingRow: {flexDirection: "row", justifyContent: "space-between", gap: 16, marginTop: 16, paddingTop: 14, borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.24)"},
+  billingLabel: {fontFamily: f.regular, fontSize: 12, color: "#EAD9C9"},
   billingValue: {fontFamily: f.bold, fontSize: 14, color: c.white, marginTop: 4},
-  metricGrid: {flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 14},
-  metricCard: {width: "48%", flexGrow: 1, minHeight: 94, padding: 14, borderRadius: 14, borderWidth: 1, borderColor: c.border, backgroundColor: c.white},
-  metricLabel: {fontFamily: f.regular, fontSize: 11, color: c.muted},
-  metricValue: {fontFamily: f.bold, fontSize: 22, color: c.text, marginTop: 8},
+  metricGrid: {flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 14},
+  metricCard: {width: "48%", flexGrow: 1, minHeight: 100, padding: 15, borderRadius: 14, borderWidth: 1, borderColor: c.border, backgroundColor: c.white},
+  metricLabel: {fontFamily: f.regular, fontSize: 12, color: c.muted},
+  metricValue: {fontFamily: f.bold, fontSize: 23, color: c.text, marginTop: 8},
   metricHint: {fontFamily: f.regular, fontSize: 10, lineHeight: 15, color: c.muted, marginTop: 3},
-  sectionTitle: {fontFamily: f.bold, fontSize: 17, color: c.text, marginTop: 28, marginBottom: 10},
-  paymentRow: {flexDirection: "row", alignItems: "center", gap: 11, minHeight: 62, borderBottomWidth: 1, borderBottomColor: c.border},
+  sectionTitle: {fontFamily: f.bold, fontSize: 17, color: c.text, marginTop: 24, marginBottom: 10},
+  paymentRow: {flexDirection: "row", alignItems: "center", gap: 11, minHeight: 62, paddingHorizontal: 12, borderBottomWidth: 1, borderBottomColor: c.border, backgroundColor: c.white},
   paymentIcon: {width: 36, height: 36, alignItems: "center", justifyContent: "center", borderRadius: 10, backgroundColor: c.beige},
   paymentCopy: {flex: 1},
   paymentName: {fontFamily: f.bold, fontSize: 13, color: c.text},
