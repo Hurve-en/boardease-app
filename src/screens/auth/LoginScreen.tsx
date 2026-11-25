@@ -1,4 +1,5 @@
-import {colors} from "@/constants/theme";
+import {fonts, palette} from "@/constants/theme";
+import Notice from "@/components/ui/Notice";
 import {getUserRole, signIn} from "@/lib/auth";
 import {useRouter} from "expo-router";
 import {useState} from "react";
@@ -11,8 +12,10 @@ import {
 	Text,
 	View,
 } from "react-native";
-import {SafeAreaView} from "react-native-safe-area-context";
-import AuthHeader from "@/components/auth/AuthHeader";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
+import {Image} from "expo-image";
+import {StatusBar} from "expo-status-bar";
+import LogoMark from "@/components/auth/LogoMark";
 import PrimaryButton from "@/components/ui/PrimaryButton";
 import TextField from "@/components/ui/TextField";
 
@@ -20,6 +23,7 @@ export default function LoginScreen() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const router = useRouter();
+	const insets = useSafeAreaInsets();
 	const [problem, setProblem] = useState("");
 	const [notice, setNotice] = useState("");
 	const [busy, setBusy] = useState(false);
@@ -62,109 +66,90 @@ export default function LoginScreen() {
 	}
 
 	return (
-		<SafeAreaView style={styles.safe}>
+		<View style={styles.root}>
+			<StatusBar style="light" />
+			<Image source={require("@/assets/brand/login-hero.jpg")} style={styles.hero} contentFit="cover" contentPosition="top" accessible={false} />
+			<View style={[styles.brand, {top: insets.top + 16}]}>
+				<LogoMark size={28} />
+				<Text style={styles.brandName}>BoardEase</Text>
+			</View>
 			<KeyboardAvoidingView
 				style={{flex: 1}}
 				behavior={Platform.OS === "ios" ? "padding" : undefined}>
 				<ScrollView
-					contentContainerStyle={styles.container}
-					keyboardShouldPersistTaps="handled">
-					<AuthHeader />
+					contentContainerStyle={styles.scroll}
+					keyboardShouldPersistTaps="handled"
+					bounces={false}
+					alwaysBounceVertical={false}
+					overScrollMode="never"
+					showsVerticalScrollIndicator={false}>
+					<View style={[styles.sheet, {paddingBottom: insets.bottom + 32}]}>
+					<View style={styles.container}>
+					<Text style={styles.title}>Sign in to BoardEase</Text>
+					<Text style={styles.subtitle}>See your bills, payments and room details.</Text>
 
-					<Text style={styles.title}>Welcome home.</Text>
-					<Text style={styles.subtitle}>
-						Sign in to view your monthly bills and recorded payments.
-					</Text>
-
-					<View style={{marginTop: 8}}>
+					<View style={{marginTop: 20}}>
 						<TextField
-							label="Email address"
+							label="Email"
+							hideLabel
 							value={email}
 							onChangeText={setEmail}
 							keyboardType="email-address"
 							autoCapitalize="none"
 							autoComplete="email"
-							placeholder="you@email.com"
 						/>
 						<TextField
 							label="Password"
+							hideLabel
 							value={password}
 							onChangeText={setPassword}
 							secureTextEntry
 							autoComplete="password"
-							placeholder="Your password"
 						/>
 					</View>
 
-					<Pressable onPress={() => {}}>
+					<Pressable onPress={() => {}} style={styles.forgotWrap} hitSlop={8}>
 						<Text style={styles.forgot}>Forgot password?</Text>
 					</Pressable>
 
-					<View style={{marginTop: 18}}>
-						{problem ? (
-							<View
-								style={[styles.message, styles.errorMessage]}
-								accessibilityRole="alert">
-								<Text style={styles.errorText}>{problem}</Text>
-							</View>
-						) : null}
-						{notice ? (
-							<View
-								style={[styles.message, styles.noticeMessage]}
-								accessibilityRole="alert">
-								<Text style={styles.noticeText}>{notice}</Text>
-							</View>
-						) : null}
+					<View style={styles.actions}>
+						{problem ? <Notice tone="error" message={problem} /> : null}
+						{notice ? <Notice tone="success" message={notice} /> : null}
 						<PrimaryButton
 							title={busy ? "Signing in…" : "Sign in"}
 							disabled={busy}
-							icon="arrow-forward"
+							busy={busy}
 							onPress={handleSignIn}
 						/>
 					</View>
 
-					<Pressable
-						style={({pressed}) => [styles.secondary, pressed && {opacity: 0.7}]}
-						onPress={() => router.push("/register")}>
-						<Text style={styles.secondaryText}>Create an account</Text>
-					</Pressable>
+					<Text style={styles.switch}>
+						New tenant?{" "}
+						<Text style={styles.switchLink} onPress={() => router.push("/register")} accessibilityRole="link">
+							Create an account
+						</Text>
+					</Text>
+					</View>
+					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
-		</SafeAreaView>
+		</View>
 	);
 }
 
 const styles = StyleSheet.create({
-	safe: {flex: 1, backgroundColor: colors.bg},
-	container: {padding: 28, paddingTop: 24},
-	title: {marginTop: 28, fontSize: 30, fontWeight: "700", color: colors.text},
-	subtitle: {marginTop: 6, fontSize: 15, lineHeight: 22, color: colors.muted},
-	forgot: {
-		marginTop: 18,
-		fontSize: 13,
-		fontWeight: "600",
-		color: colors.brown,
-	},
-	message: {
-		marginBottom: 12,
-		paddingHorizontal: 14,
-		paddingVertical: 12,
-		borderRadius: 10,
-		borderWidth: 1,
-	},
-	errorMessage: {backgroundColor: "#FCEBE8", borderColor: "#E9B8B0"},
-	errorText: {color: "#9A3529", fontSize: 13, lineHeight: 19},
-	noticeMessage: {backgroundColor: "#EAF4E9", borderColor: "#B9D5B6"},
-	noticeText: {color: "#34633A", fontSize: 13, lineHeight: 19},
-	footer: {marginTop: 28, fontSize: 13, lineHeight: 19, color: colors.muted},
-	secondary: {
-		marginTop: 12,
-		height: 48,
-		borderRadius: 10,
-		borderWidth: 1,
-		borderColor: colors.brown,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	secondaryText: {fontSize: 15, fontWeight: "600", color: colors.brown},
+	root: {flex: 1, backgroundColor: palette.brandDeep},
+	hero: {position: "absolute", top: 0, left: 0, right: 0, height: "62%"},
+	brand: {position: "absolute", left: 24, flexDirection: "row", alignItems: "center", gap: 10, zIndex: 1},
+	brandName: {fontFamily: fonts.bold, fontSize: 18, letterSpacing: -0.4, color: palette.inverse},
+	scroll: {flexGrow: 1, justifyContent: "flex-end"},
+	sheet: {marginTop: 220, backgroundColor: palette.surface, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingTop: 8},
+	container: {padding: 24, paddingBottom: 0, width: "100%", maxWidth: 420, alignSelf: "center"},
+	title: {marginTop: 8, textAlign: "center", fontSize: 24, letterSpacing: -0.5, fontFamily: fonts.semibold, color: palette.text},
+	subtitle: {marginTop: 6, textAlign: "center", fontSize: 14, lineHeight: 20, fontFamily: fonts.regular, color: palette.muted},
+	forgotWrap: {alignSelf: "flex-end", marginTop: 12, marginRight: 4},
+	forgot: {fontSize: 13, fontFamily: fonts.medium, color: palette.textSecondary, textDecorationLine: "underline"},
+	actions: {marginTop: 18, gap: 12},
+	switch: {marginTop: 28, textAlign: "center", fontSize: 14, fontFamily: fonts.regular, color: palette.muted},
+	switchLink: {fontFamily: fonts.semibold, color: palette.primary},
 });

@@ -1,4 +1,5 @@
-import { colors } from "@/constants/theme";
+import { fonts, palette } from "@/constants/theme";
+import Notice from "@/components/ui/Notice";
 import { supabase } from "@/lib/supabase";
 import { signIn } from "@/lib/auth";
 import { Link, router } from "expo-router";
@@ -100,12 +101,10 @@ export default function RegisterScreen() {
         >
           <AuthHeader />
 
-          <Text style={styles.title}>Create your account.</Text>
-          <Text style={styles.subtitle}>
-            Sign up to view your monthly bills and recorded payments.
-          </Text>
+          <Text style={styles.title}>Create your account</Text>
+          <Text style={styles.subtitle}>Your owner links it to your room after you sign up.</Text>
 
-          <View style={{ marginTop: 8 }}>
+          <View style={{ marginTop: 12 }}>
             <TextField
               label="Full name"
               value={name}
@@ -143,38 +142,26 @@ export default function RegisterScreen() {
           </View>
 
           <Text style={styles.terms}>
-            By creating an account, you agree to our{" "}
-            <Text style={styles.bold}>Terms of Service</Text> and{" "}
-            <Text style={styles.bold}>Privacy Policy</Text>.
+            By creating an account, you agree to the Terms of Service and Privacy Policy.
           </Text>
 
-          {problem ? (
-            <View style={[styles.message, styles.errorMessage]} accessibilityRole="alert">
-              <Text style={styles.errorText}>{problem}</Text>
-            </View>
-          ) : null}
-          {notice ? (
-            <View style={[styles.message, styles.noticeMessage]} accessibilityRole="alert">
-              <Text style={styles.noticeText}>{notice}</Text>
-            </View>
-          ) : null}
+          <View style={styles.actions}>
+            {problem ? <Notice tone="error" message={problem} /> : null}
+            {notice ? <Notice tone="success" message={notice} /> : null}
 
           <PrimaryButton
             title={busy ? "Creating account…" : created ? "Continue to sign in" : "Create account"}
             disabled={busy}
-            icon="arrow-forward"
+            busy={busy}
             onPress={submit}
           />
+          </View>
 
           <Text style={styles.login}>
             Already have an account?{" "}
-            <Link href="/login" style={styles.bold}>
-              Log in
+            <Link href="/login" style={styles.link}>
+              Sign in
             </Link>
-          </Text>
-
-          <Text style={styles.footer}>
-            Secure access to your bills and recorded payments.
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -183,29 +170,12 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.bg },
-  container: { padding: 24, paddingBottom: 40 },
-  title: { marginTop: 28, fontSize: 30, fontWeight: "700", color: colors.text },
-  subtitle: { marginTop: 6, fontSize: 15, lineHeight: 22, color: colors.muted },
-  terms: {
-    marginTop: 24,
-    marginBottom: 16,
-    fontSize: 13,
-    lineHeight: 19,
-    color: colors.muted,
-  },
-  message: {
-    marginBottom: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-  },
-  errorMessage: { backgroundColor: "#FCEBE8", borderColor: "#E9B8B0" },
-  errorText: { color: "#9A3529", fontSize: 13, lineHeight: 19 },
-  noticeMessage: { backgroundColor: "#EAF4E9", borderColor: "#B9D5B6" },
-  noticeText: { color: "#34633A", fontSize: 13, lineHeight: 19 },
-  bold: { fontWeight: "700", color: colors.brown },
-  login: { marginTop: 24, fontSize: 13, color: colors.muted },
-  footer: { marginTop: 24, fontSize: 12, color: colors.muted },
+  safe: { flex: 1, backgroundColor: palette.surface },
+  container: { flexGrow: 1, justifyContent: "center", padding: 24, paddingBottom: 40, width: "100%", maxWidth: 420, alignSelf: "center" },
+  title: { marginTop: 28, textAlign: "center", fontSize: 24, letterSpacing: -0.5, fontFamily: fonts.semibold, color: palette.text },
+  subtitle: { marginTop: 6, textAlign: "center", fontSize: 14, lineHeight: 20, fontFamily: fonts.regular, color: palette.muted },
+  terms: { marginTop: 20, fontSize: 12, lineHeight: 18, fontFamily: fonts.regular, color: palette.muted, textAlign: "center" },
+  actions: { marginTop: 16, gap: 12 },
+  link: { fontFamily: fonts.semibold, color: palette.primary },
+  login: { marginTop: 28, textAlign: "center", fontSize: 14, fontFamily: fonts.regular, color: palette.muted },
 });
