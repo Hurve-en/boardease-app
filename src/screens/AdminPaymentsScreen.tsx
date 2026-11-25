@@ -1,4 +1,5 @@
 import {AdminTabBar} from "@/components/navigation/AdminTabBar";
+import { palette, radius } from "@/constants/theme";
 import {AdminScreenHeader} from "@/components/navigation/AdminScreenHeader";
 import {
   approvePaymentSubmission,
@@ -39,7 +40,7 @@ function currentMonth() {
 }
 
 function monthLabel(value: string) {
-  const date = new Date(`${value}-01T12:00:00`);
+  const date = new Date(`${value.slice(0, 7)}-01T12:00:00`);
   return Number.isNaN(date.getTime())
     ? value
     : date.toLocaleDateString(undefined, {month: "long", year: "numeric"});
@@ -268,7 +269,7 @@ export default function AdminPaymentsScreen() {
                   <View style={styles.billTop}>
                     <View style={styles.billCopy}>
                       <Text style={styles.tenantName}>{bill.tenantName}</Text>
-                      <Text style={styles.billSubtitle}>Room {bill.roomNumber ?? "—"} · {monthLabel(bill.billingMonth)}</Text>
+                      <Text style={styles.billSubtitle}>Room {bill.roomNumber ?? "—"}, {monthLabel(bill.billingMonth)}</Text>
                     </View>
                     <View style={[styles.statusPill, statusStyle(bill.status)]}><Text style={styles.statusText}>{bill.status}</Text></View>
                   </View>
@@ -278,7 +279,7 @@ export default function AdminPaymentsScreen() {
                       <Text style={styles.outstanding}>{money(bill.outstandingBalance)}</Text>
                     </View>
                     <View style={styles.receiptSummary}>
-                      <Ionicons name="receipt-outline" size={16} color={pendingCount ? "#8A5A12" : c.muted} />
+                      <Ionicons name="receipt-outline" size={16} color={pendingCount ? palette.warning : c.muted} />
                       <Text style={styles.receiptSummaryText}>{pendingCount ? `${pendingCount} pending` : `${receipts.length} receipt${receipts.length === 1 ? "" : "s"}`}</Text>
                     </View>
                     <Ionicons name="chevron-forward" size={17} color={c.muted} />
@@ -300,9 +301,8 @@ export default function AdminPaymentsScreen() {
             <ScrollView contentContainerStyle={styles.modalContent}>
               <View style={styles.modalHeader}>
                 <View style={styles.billCopy}>
-                  <Text style={styles.eyebrow}>PAYMENT DETAILS</Text>
                   <Text style={styles.modalTitle}>{selectedBill.tenantName}</Text>
-                  <Text style={styles.billSubtitle}>Room {selectedBill.roomNumber ?? "—"} · {monthLabel(selectedBill.billingMonth)}</Text>
+                  <Text style={styles.billSubtitle}>Room {selectedBill.roomNumber ?? "—"}, {monthLabel(selectedBill.billingMonth)}</Text>
                 </View>
                 <Pressable accessibilityRole="button" accessibilityLabel="Close payment details" onPress={() => setSelectedBill(null)} style={styles.closeButton}>
                   <Ionicons name="close" size={22} color={c.brown} />
@@ -321,7 +321,7 @@ export default function AdminPaymentsScreen() {
                   <View style={styles.receiptIcon}><Ionicons name="image-outline" size={20} color={c.brown} /></View>
                   <View style={styles.receiptCopy}>
                     <Text style={styles.receiptAmount}>{money(submission.amount)}</Text>
-                    <Text style={styles.receiptMeta}>{submission.referenceNumber || "No reference"} · {formatDate(submission.submittedAt)}</Text>
+                    <Text style={styles.receiptMeta}>{submission.referenceNumber || "No reference"}, {formatDate(submission.submittedAt)}</Text>
                   </View>
                   <View style={[styles.statusPill, statusStyle(submission.status)]}><Text style={styles.statusText}>{submissionStatusLabel(submission.status)}</Text></View>
                 </Pressable>
@@ -350,9 +350,8 @@ export default function AdminPaymentsScreen() {
             <ScrollView contentContainerStyle={styles.modalContent}>
               <View style={styles.modalHeader}>
                 <View style={styles.billCopy}>
-                  <Text style={styles.eyebrow}>RECEIPT REVIEW</Text>
                   <Text style={styles.modalTitle}>{selectedSubmission.tenantFirstName} {selectedSubmission.tenantLastName}</Text>
-                  <Text style={styles.billSubtitle}>{monthLabel(selectedSubmission.billingMonth)} · Reference {selectedSubmission.referenceNumber || "—"}</Text>
+                  <Text style={styles.billSubtitle}>{monthLabel(selectedSubmission.billingMonth)}, reference {selectedSubmission.referenceNumber || "—"}</Text>
                 </View>
                 <Pressable accessibilityRole="button" accessibilityLabel="Close receipt review" onPress={closeSubmission} style={styles.closeButton}>
                   <Ionicons name="close" size={22} color={c.brown} />
@@ -414,65 +413,64 @@ export default function AdminPaymentsScreen() {
 const styles = StyleSheet.create({
   safe: {flex: 1, backgroundColor: c.background},
   loading: {flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: c.background},
-  content: {flexGrow: 1, width: "100%", maxWidth: 600, alignSelf: "center", paddingHorizontal: 20, paddingTop: 8, paddingBottom: 28},
-  eyebrow: {fontFamily: f.bold, fontSize: 10, letterSpacing: 1, color: c.muted},
+  content: {flexGrow: 1, width: "100%", maxWidth: 600, alignSelf: "center", paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24},
   pressed: {opacity: 0.68},
   monthRow: {flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 14},
-  monthButton: {width: 38, height: 38, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: c.white, borderWidth: 1, borderColor: c.border},
+  monthButton: {width: 36, height: 36, borderRadius: radius.control, alignItems: "center", justifyContent: "center", backgroundColor: c.white, borderWidth: 1, borderColor: c.border},
   month: {fontFamily: f.bold, fontSize: 15, color: c.text},
-  filterScroll: {height: 48, flexGrow: 0, marginBottom: 16},
+  filterScroll: {height: 40, flexGrow: 0, marginBottom: 10},
   filters: {alignItems: "center", gap: 8},
-  filter: {paddingHorizontal: 13, paddingVertical: 8, borderRadius: 20, backgroundColor: c.white, borderWidth: 1, borderColor: c.border},
-  filterSelected: {backgroundColor: c.brown, borderColor: c.brown},
-  filterLabel: {fontFamily: f.regular, fontSize: 11, color: c.muted, textTransform: "capitalize"},
-  filterLabelSelected: {fontFamily: f.bold, color: c.white},
-  list: {gap: 10},
-  billCard: {padding: 15, borderRadius: 14, borderWidth: 1, borderColor: c.border, backgroundColor: c.white},
+  filter: {paddingHorizontal: 12, paddingVertical: 7, borderRadius: radius.pill, backgroundColor: c.white, borderWidth: 1, borderColor: c.border},
+  filterSelected: {backgroundColor: palette.surfaceSelected, borderColor: palette.borderStrong},
+  filterLabel: {fontFamily: f.regular, fontSize: 12, color: c.muted, textTransform: "capitalize"},
+  filterLabelSelected: {fontFamily: f.bold, color: c.text},
+  list: {gap: 8},
+  billCard: {padding: 12, borderRadius: radius.card, borderWidth: 1, borderColor: c.border, backgroundColor: c.white},
   billTop: {flexDirection: "row", alignItems: "flex-start", gap: 10},
   billCopy: {flex: 1},
   tenantName: {fontFamily: f.bold, fontSize: 14, color: c.text},
-  billSubtitle: {fontFamily: f.regular, fontSize: 11, color: c.muted, marginTop: 4},
-  statusPill: {alignSelf: "flex-start", paddingHorizontal: 9, paddingVertical: 5, borderRadius: 14},
-  statusText: {fontFamily: f.bold, fontSize: 9, color: c.text, textTransform: "capitalize"},
+  billSubtitle: {fontFamily: f.regular, fontSize: 12, color: c.muted, marginTop: 4},
+  statusPill: {alignSelf: "flex-start", paddingHorizontal: 9, paddingVertical: 3, borderRadius: radius.pill},
+  statusText: {fontFamily: f.bold, fontSize: 12, color: c.text, textTransform: "capitalize"},
   statusPaid: {backgroundColor: c.paid},
   statusPending: {backgroundColor: c.partial},
-  statusUnpaid: {backgroundColor: "#F7E4DD"},
-  statusNeedsUpdate: {backgroundColor: "#F4DCD2"},
-  billBottom: {flexDirection: "row", alignItems: "flex-end", gap: 9, marginTop: 14},
-  billMeta: {fontFamily: f.regular, fontSize: 10, color: c.muted},
-  outstanding: {fontFamily: f.bold, fontSize: 15, color: c.brown, marginTop: 3},
+  statusUnpaid: {backgroundColor: palette.dangerSurface},
+  statusNeedsUpdate: {backgroundColor: palette.dangerSurface},
+  billBottom: {flexDirection: "row", alignItems: "flex-end", gap: 9, marginTop: 10},
+  billMeta: {fontFamily: f.regular, fontSize: 12, color: c.muted},
+  outstanding: {fontFamily: f.bold, fontSize: 16, color: c.text, marginTop: 2, fontVariant: ["tabular-nums"]},
   receiptSummary: {flexDirection: "row", alignItems: "center", gap: 5, marginLeft: "auto", paddingBottom: 2},
-  receiptSummaryText: {fontFamily: f.regular, fontSize: 10, color: c.muted},
+  receiptSummaryText: {fontFamily: f.regular, fontSize: 12, color: c.muted},
   state: {flex: 1, minHeight: 220, alignItems: "center", justifyContent: "center", gap: 12, padding: 20},
   body: {fontFamily: f.regular, fontSize: 13, lineHeight: 20, color: c.muted},
-  error: {fontFamily: f.regular, fontSize: 13, lineHeight: 20, color: "#9A3529"},
-  retry: {paddingHorizontal: 18, paddingVertical: 10, borderRadius: 10, backgroundColor: c.brown},
+  error: {fontFamily: f.regular, fontSize: 13, lineHeight: 20, color: palette.danger},
+  retry: {paddingHorizontal: 18, paddingVertical: 10, borderRadius: radius.pill, backgroundColor: c.brown},
   retryText: {fontFamily: f.bold, fontSize: 13, color: c.white},
   modalSafe: {flex: 1, backgroundColor: c.background},
-  modalContent: {width: "100%", maxWidth: 600, alignSelf: "center", padding: 20, paddingBottom: 36, gap: 12},
+  modalContent: {width: "100%", maxWidth: 600, alignSelf: "center", padding: 16, paddingBottom: 28, gap: 10},
   modalHeader: {flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 8},
-  modalTitle: {fontFamily: f.bold, fontSize: 21, color: c.text, marginTop: 4},
-  closeButton: {width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center", backgroundColor: c.beige},
-  detailCard: {padding: 16, gap: 12, borderRadius: 14, borderWidth: 1, borderColor: c.border, backgroundColor: c.white},
+  modalTitle: {fontFamily: f.bold, fontSize: 20, color: c.text},
+  closeButton: {width: 36, height: 36, borderRadius: radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: c.beige},
+  detailCard: {padding: 14, gap: 10, borderRadius: radius.card, borderWidth: 1, borderColor: c.border, backgroundColor: c.white},
   detailRow: {flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12},
   detailLabel: {fontFamily: f.regular, fontSize: 12, color: c.muted},
   detailValue: {fontFamily: f.bold, fontSize: 13, color: c.text},
-  sectionTitle: {fontFamily: f.bold, fontSize: 16, color: c.text},
-  receiptCard: {minHeight: 64, flexDirection: "row", alignItems: "center", gap: 11, padding: 12, borderRadius: 12, borderWidth: 1, borderColor: c.border, backgroundColor: c.white},
-  receiptIcon: {width: 36, height: 36, borderRadius: 10, alignItems: "center", justifyContent: "center", backgroundColor: c.beige},
+  sectionTitle: {fontFamily: f.bold, fontSize: 15, color: c.text},
+  receiptCard: {minHeight: 56, flexDirection: "row", alignItems: "center", gap: 10, padding: 12, borderRadius: radius.card, borderWidth: 1, borderColor: c.border, backgroundColor: c.white},
+  receiptIcon: {width: 32, height: 32, borderRadius: radius.control, alignItems: "center", justifyContent: "center", backgroundColor: c.beige},
   receiptCopy: {flex: 1},
   receiptAmount: {fontFamily: f.bold, fontSize: 13, color: c.text},
-  receiptMeta: {fontFamily: f.regular, fontSize: 10, color: c.muted, marginTop: 3},
+  receiptMeta: {fontFamily: f.regular, fontSize: 12, color: c.muted, marginTop: 3},
   reviewNote: {fontFamily: f.regular, fontSize: 12, lineHeight: 18, color: c.muted, paddingTop: 6},
-  receiptImageButton: {height: 260, alignItems: "center", justifyContent: "center", padding: 8, borderRadius: 14, backgroundColor: "#302923"},
+  receiptImageButton: {height: 260, alignItems: "center", justifyContent: "center", padding: 8, borderRadius: radius.card, backgroundColor: palette.brandDeep},
   receiptImage: {width: "100%", height: 220},
-  imageHint: {fontFamily: f.regular, fontSize: 10, color: c.white, marginTop: 4},
-  input: {minHeight: 46, borderRadius: 9, borderWidth: 1, borderColor: c.border, paddingHorizontal: 12, fontFamily: f.regular, fontSize: 13, color: c.text, backgroundColor: c.white},
+  imageHint: {fontFamily: f.regular, fontSize: 12, color: c.white, marginTop: 4},
+  input: {minHeight: 44, borderRadius: radius.control, borderWidth: 1, borderColor: c.border, paddingHorizontal: 12, fontFamily: f.regular, fontSize: 13, color: c.text, backgroundColor: c.white},
   noteInput: {minHeight: 76, textAlignVertical: "top", paddingTop: 12},
-  primaryButton: {minHeight: 46, alignItems: "center", justifyContent: "center", borderRadius: 10, backgroundColor: c.brown, paddingHorizontal: 14},
+  primaryButton: {minHeight: 44, alignItems: "center", justifyContent: "center", borderRadius: radius.pill, backgroundColor: c.brown, paddingHorizontal: 14},
   primaryButtonLabel: {fontFamily: f.bold, fontSize: 13, color: c.white},
-  secondaryButton: {minHeight: 44, alignItems: "center", justifyContent: "center", borderRadius: 10, borderWidth: 1, borderColor: c.brown, paddingHorizontal: 14},
-  secondaryButtonLabel: {fontFamily: f.bold, fontSize: 13, color: c.brown},
+  secondaryButton: {minHeight: 44, alignItems: "center", justifyContent: "center", borderRadius: radius.pill, borderWidth: 1, borderColor: c.border, backgroundColor: c.white, paddingHorizontal: 14},
+  secondaryButtonLabel: {fontFamily: f.bold, fontSize: 13, color: c.text},
   previewBackdrop: {flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.94)"},
   previewImage: {width: "100%", height: "85%"},
   previewClose: {position: "absolute", top: 48, right: 18, zIndex: 1, width: 44, height: 44, alignItems: "center", justifyContent: "center", borderRadius: 22, backgroundColor: "rgba(255,255,255,0.16)"},
