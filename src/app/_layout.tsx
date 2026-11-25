@@ -1,4 +1,12 @@
+import { palette } from "@/constants/theme";
 import { getAuthState, onAuthChange, type UserRole } from "@/lib/auth";
+import {
+	InterTight_400Regular,
+	InterTight_500Medium,
+	InterTight_600SemiBold,
+	InterTight_700Bold,
+	useFonts,
+} from "@expo-google-fonts/inter-tight";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
@@ -11,6 +19,12 @@ export default function RootLayout() {
 		role: UserRole | null;
 	}>({signedIn: false, role: null});
 	const [ready, setReady] = useState(false);
+	const [fontsLoaded, fontError] = useFonts({
+		InterTight_400Regular,
+		InterTight_500Medium,
+		InterTight_600SemiBold,
+		InterTight_700Bold,
+	});
 
 	useEffect(() => {
 		let active = true;
@@ -31,16 +45,16 @@ export default function RootLayout() {
 		};
 	}, []);
 
-	if (!ready) {
+	if (!ready || (!fontsLoaded && !fontError)) {
 		return (
-			<View style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
-				<ActivityIndicator accessibilityLabel="Loading session" />
+			<View style={{flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: palette.canvas}}>
+				<ActivityIndicator color={palette.primary} accessibilityLabel="Loading session" />
 			</View>
 		);
 	}
 
 	return (
-		<Stack screenOptions={{headerShown: false}}>
+		<Stack screenOptions={{headerShown: false, contentStyle: {backgroundColor: palette.canvas}}}>
 			<Stack.Protected guard={authState.signedIn && authState.role === "admin"}>
 				<Stack.Screen name="admin" />
 				<Stack.Screen name="admin-payments" />
