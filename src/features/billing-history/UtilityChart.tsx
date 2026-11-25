@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { palette } from "@/constants/theme";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { chartRange, chartScale, chartX, formatChartMoney, monthName, type HistoryBill, type Utility } from "./model";
 import { historyColors as c, historyFonts as f } from "./theme";
@@ -52,25 +53,25 @@ export function UtilityChart({ bills }: { bills: HistoryBill[] }) {
           <View style={styles.months}>{width > 0 ? bills.map((bill, index) => <View key={bill.billId} style={[styles.monthAnchor, { left: points[index].x - 24 }]}><Text style={styles.month}>{monthName(bill.billingMonth).slice(0, 3)}</Text></View>) : null}</View>
         </View>
       </View>
-      <Text style={styles.caption}>{last ? `${monthName(last.billingMonth)} · ${formatChartMoney(values[values.length - 1])}` : ""}</Text>
+      <Text style={styles.caption}>{last ? `${monthName(last.billingMonth)}: ${formatChartMoney(values[values.length - 1])}` : ""}</Text>
     </>}
   </View>;
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: c.white, borderRadius: 14, borderWidth: 1, borderColor: c.border, padding: 15, marginTop: 16 },
+  card: { backgroundColor: c.white, borderRadius: 12, borderWidth: 1, borderColor: c.border, padding: 14, marginTop: 14 },
   heading: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 8 },
-  title: { fontFamily: f.bold, fontSize: 16, color: c.text },
+  title: { fontFamily: f.bold, fontSize: 15, color: c.text },
   range: { fontFamily: f.regular, fontSize: 12, color: c.muted },
-  segments: { flexDirection: "row", backgroundColor: c.background, padding: 2, borderRadius: 8, marginTop: 10 },
-  segment: { flex: 1, minHeight: 44, padding: 10, alignItems: "center", justifyContent: "center", borderRadius: 6 },
-  selected: { backgroundColor: c.brown },
-  segmentText: { fontFamily: f.bold, fontSize: 13, color: c.brown },
-  selectedText: { color: c.white },
+  segments: { flexDirection: "row", backgroundColor: palette.surfaceSubtle, padding: 2, borderRadius: 8, marginTop: 10, borderWidth: 1, borderColor: c.border },
+  segment: { flex: 1, minHeight: 36, padding: 8, alignItems: "center", justifyContent: "center", borderRadius: 6 },
+  selected: { backgroundColor: c.white, shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 2, shadowOffset: { width: 0, height: 1 }, elevation: 1 },
+  segmentText: { fontFamily: f.regular, fontSize: 13, color: c.muted },
+  selectedText: { fontFamily: f.bold, color: c.text },
   pressed: { opacity: 0.7 },
   chart: { flexDirection: "row", marginTop: 14, minHeight: 84 },
   axis: { width: 54, height: 66, justifyContent: "space-between" },
-  tick: { fontFamily: f.regular, fontSize: 10, color: c.muted },
+  tick: { fontFamily: f.regular, fontSize: 12, color: c.muted },
   plotArea: { flex: 1 },
   plot: { height: 66 },
   grid: { position: "absolute", left: 0, right: 0, height: 1, backgroundColor: c.border },
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
   dot: { position: "absolute", width: 8, height: 8, borderWidth: 1.5, borderRadius: 4, borderColor: c.brown, backgroundColor: c.white },
   months: { minHeight: 18 },
   monthAnchor: { position: "absolute", top: 0, width: 48, alignItems: "center" },
-  month: { fontFamily: f.regular, fontSize: 11, color: c.muted },
-  caption: { textAlign: "right", fontFamily: f.bold, fontSize: 11, color: c.brown, marginTop: 4 },
+  month: { fontFamily: f.regular, fontSize: 12, color: c.muted },
+  caption: { textAlign: "right", fontFamily: f.bold, fontSize: 12, color: c.brown, marginTop: 4 },
   empty: { paddingVertical: 24, fontFamily: f.regular, fontSize: 13, color: c.muted, lineHeight: 20 },
 });

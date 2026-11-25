@@ -117,14 +117,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 12,
   },
-  title: { fontFamily: f.bold, fontSize: 18, color: c.text, flexShrink: 1 },
+  title: { fontFamily: f.bold, fontSize: 16, color: c.text, flexShrink: 1 },
   close: {
     minWidth: 48,
     minHeight: 48,
     alignItems: "center",
     justifyContent: "center",
   },
-  label: { fontFamily: f.bold, fontSize: 14, color: c.brown },
+  label: { fontFamily: f.regular, fontSize: 14, color: c.text },
   option: {
     minHeight: 52,
     flexDirection: "row",

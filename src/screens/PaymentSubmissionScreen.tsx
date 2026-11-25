@@ -1,6 +1,5 @@
 import { TenantTabBar } from "@/components/navigation/TenantTabBar";
 import { fetchBillingHistory } from "@/features/billing-history/api";
-import { HistoryIcon } from "@/features/billing-history/HistoryIcon";
 import {
   billMonthLabel,
   formatMoney,
@@ -28,17 +27,19 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import LogoMark from "@/components/auth/LogoMark";
+import { fonts, palette, radius } from "@/constants/theme";
 
 const c = {
-  background: "#F7F4EE",
-  brown: "#583E30",
-  text: "#27211D",
-  muted: "#857B70",
-  border: "#E6DDD2",
-  beige: "#EDE2D5",
-  white: "#FFFFFF",
-  green: "#37704A",
-  red: "#A53F32",
+  background: palette.canvas,
+  brown: palette.primary,
+  text: palette.text,
+  muted: palette.muted,
+  border: palette.border,
+  beige: palette.surfaceSelected,
+  white: palette.surface,
+  green: palette.success,
+  red: palette.danger,
 };
 
 const PAYMENT_METHODS = ["GCash", "Maya", "Bank transfer", "Cash"] as const;
@@ -192,9 +193,7 @@ export default function PaymentSubmissionScreen() {
       <SafeAreaView style={styles.screen} edges={["top", "left", "right"]}>
         <View style={styles.brandHeader}>
           <View style={styles.brand}>
-            <View style={styles.brandMark}>
-              <HistoryIcon name="brand" />
-            </View>
+            <LogoMark size={28} />
             <Text style={styles.brandName}>BoardEase</Text>
           </View>
         </View>
@@ -221,9 +220,7 @@ export default function PaymentSubmissionScreen() {
       <SafeAreaView style={styles.screen} edges={["top", "left", "right"]}>
         <View style={styles.brandHeader}>
           <View style={styles.brand}>
-            <View style={styles.brandMark}>
-              <HistoryIcon name="brand" />
-            </View>
+            <LogoMark size={28} />
             <Text style={styles.brandName}>BoardEase</Text>
           </View>
         </View>
@@ -249,9 +246,7 @@ export default function PaymentSubmissionScreen() {
     <SafeAreaView style={styles.screen} edges={["top", "left", "right"]}>
       <View style={styles.brandHeader}>
         <View style={styles.brand}>
-          <View style={styles.brandMark}>
-            <HistoryIcon name="brand" />
-          </View>
+          <LogoMark size={28} />
           <Text style={styles.brandName}>BoardEase</Text>
         </View>
         <View style={styles.avatar}>
@@ -273,8 +268,8 @@ export default function PaymentSubmissionScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <Text style={styles.billContext}>
-          {billMonthLabel(bill.billingMonth).toUpperCase()}
-          {tenant?.roomNumber ? ` · ROOM ${tenant.roomNumber}` : ""}
+          {billMonthLabel(bill.billingMonth)} bill
+          {tenant?.roomNumber ? `, Room ${tenant.roomNumber}` : ""}
         </Text>
 
         <View style={styles.billCard}>
@@ -292,7 +287,7 @@ export default function PaymentSubmissionScreen() {
           />
           <MoneyRow label="Payments recorded" value={formatMoney(paid)} />
           <View style={styles.balanceBox}>
-            <Text style={styles.balanceLabel}>OUTSTANDING BALANCE</Text>
+            <Text style={styles.balanceLabel}>Outstanding balance</Text>
             <Text style={styles.balanceAmount}>
               {formatMoney(bill.outstandingBalance)}
             </Text>
@@ -404,7 +399,7 @@ export default function PaymentSubmissionScreen() {
             <Text style={styles.uploadTitle}>
               {receipt ? "Choose a different image" : "Choose receipt image"}
             </Text>
-            <Text style={styles.uploadHint}>JPG or PNG · 1 image</Text>
+            <Text style={styles.uploadHint}>One JPG or PNG image</Text>
           </Pressable>
           {receipt ? (
             <View style={styles.receiptCard}>
@@ -420,8 +415,8 @@ export default function PaymentSubmissionScreen() {
                 <Text style={styles.receiptStatus}>
                   {receipt.fileSize
                     ? `${(receipt.fileSize / (1024 * 1024)).toFixed(1)} MB`
-                    : "Image"}{" "}
-                  · Ready to submit
+                    : "Image"}
+                  , ready to submit
                 </Text>
               </View>
               <Pressable
@@ -535,24 +530,16 @@ const styles = StyleSheet.create({
     backgroundColor: c.background,
   },
   brandHeader: {
-    minHeight: 66,
-    marginHorizontal: 20,
+    minHeight: 52,
+    marginHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     borderBottomWidth: 1,
     borderBottomColor: c.border,
   },
-  brand: { flexDirection: "row", alignItems: "center", gap: 10 },
-  brandMark: {
-    width: 36,
-    height: 36,
-    borderRadius: 9,
-    backgroundColor: c.brown,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  brandName: { fontFamily: "Inter_700Bold", fontSize: 19, color: c.brown },
+  brand: { flexDirection: "row", alignItems: "center", gap: 8 },
+  brandName: { fontFamily: fonts.bold, fontSize: 17, letterSpacing: -0.3, color: palette.text },
   avatar: {
     width: 38,
     height: 38,
@@ -561,27 +548,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarText: { fontFamily: "Inter_700Bold", color: c.brown, fontSize: 13 },
+  avatarText: { fontFamily: fonts.semibold, color: c.brown, fontSize: 13 },
   headingWrap: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 14,
-    paddingBottom: 14,
-    backgroundColor: c.white,
+    paddingBottom: 4,
   },
-  pageTitle: { fontFamily: "Inter_700Bold", fontSize: 23, color: c.text },
-  content: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 28, gap: 0 },
+  pageTitle: { fontFamily: fonts.semibold, fontSize: 22, letterSpacing: -0.4, color: c.text },
+  content: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 24, gap: 0 },
   billContext: {
     marginBottom: 16,
-    fontFamily: "Inter_700Bold",
-    fontSize: 11,
+    fontFamily: fonts.semibold,
+    fontSize: 12,
     color: c.brown,
-    letterSpacing: 0.15,
   },
   billCard: {
     padding: 19,
     borderWidth: 1,
     borderColor: c.border,
-    borderRadius: 16,
+    borderRadius: radius.card,
     backgroundColor: c.white,
   },
   moneyRow: {
@@ -591,44 +576,44 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 12,
   },
-  moneyLabel: { fontFamily: "Inter_400Regular", fontSize: 13, color: c.muted },
-  moneyValue: { fontFamily: "Inter_400Regular", fontSize: 13, color: c.text },
-  moneyStrong: { fontFamily: "Inter_700Bold", fontSize: 15, color: c.text },
+  moneyLabel: { fontFamily: fonts.regular, fontSize: 13, color: c.muted },
+  moneyValue: { fontFamily: fonts.regular, fontSize: 13, color: c.text },
+  moneyStrong: { fontFamily: fonts.semibold, fontSize: 15, color: c.text },
   divider: { height: 1, backgroundColor: c.border, marginVertical: 9 },
   balanceBox: {
     marginTop: 10,
     padding: 14,
-    borderRadius: 12,
+    borderRadius: radius.card,
     backgroundColor: c.beige,
   },
   balanceLabel: {
-    fontFamily: "Inter_400Regular",
-    fontSize: 10,
+    fontFamily: fonts.regular,
+    fontSize: 12,
     color: c.brown,
   },
   balanceAmount: {
     marginTop: 4,
-    fontFamily: "Inter_700Bold",
-    fontSize: 26,
+    fontFamily: fonts.semibold,
+    fontSize: 24,
     color: c.brown,
   },
   balanceDue: {
     marginTop: 3,
-    fontFamily: "Inter_400Regular",
-    fontSize: 11,
+    fontFamily: fonts.regular,
+    fontSize: 12,
     color: c.muted,
   },
   formTitle: {
     marginTop: 27,
     marginBottom: 3,
-    fontFamily: "Inter_700Bold",
+    fontFamily: fonts.semibold,
     fontSize: 18,
     color: c.text,
   },
   fieldWrap: { marginTop: 13 },
   fieldLabel: {
     marginBottom: 8,
-    fontFamily: "Inter_700Bold",
+    fontFamily: fonts.semibold,
     fontSize: 12,
     color: c.text,
   },
@@ -636,25 +621,25 @@ const styles = StyleSheet.create({
     height: 47,
     borderWidth: 1,
     borderColor: c.border,
-    borderRadius: 9,
+    borderRadius: radius.control,
     paddingHorizontal: 14,
     backgroundColor: c.white,
-    fontFamily: "Inter_400Regular",
+    fontFamily: fonts.regular,
     fontSize: 14,
     color: c.text,
   },
-  inputText: { fontFamily: "Inter_400Regular", fontSize: 14, color: c.text },
+  inputText: { fontFamily: fonts.regular, fontSize: 14, color: c.text },
   fieldHint: {
     marginTop: 8,
-    fontFamily: "Inter_400Regular",
-    fontSize: 11,
+    fontFamily: fonts.regular,
+    fontSize: 12,
     color: c.muted,
   },
   selectInput: {
     height: 47,
     borderWidth: 1,
     borderColor: c.border,
-    borderRadius: 9,
+    borderRadius: radius.control,
     paddingHorizontal: 14,
     backgroundColor: c.white,
     flexDirection: "row",
@@ -665,7 +650,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     borderWidth: 1,
     borderColor: c.border,
-    borderRadius: 9,
+    borderRadius: radius.control,
     backgroundColor: c.white,
     overflow: "hidden",
   },
@@ -687,11 +672,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: "dashed",
     borderColor: c.border,
-    borderRadius: 13,
+    borderRadius: radius.card,
     backgroundColor: c.white,
   },
-  uploadTitle: { fontFamily: "Inter_700Bold", fontSize: 13, color: c.brown },
-  uploadHint: { fontFamily: "Inter_400Regular", fontSize: 10, color: c.muted },
+  uploadTitle: { fontFamily: fonts.semibold, fontSize: 13, color: c.brown },
+  uploadHint: { fontFamily: fonts.regular, fontSize: 12, color: c.muted },
   receiptCard: {
     minHeight: 72,
     marginTop: 10,
@@ -701,7 +686,7 @@ const styles = StyleSheet.create({
     gap: 11,
     borderWidth: 1,
     borderColor: c.border,
-    borderRadius: 10,
+    borderRadius: radius.control,
     backgroundColor: c.white,
   },
   receiptThumbnail: {
@@ -711,10 +696,10 @@ const styles = StyleSheet.create({
     backgroundColor: c.background,
   },
   receiptDetails: { flex: 1, gap: 5 },
-  receiptName: { fontFamily: "Inter_700Bold", fontSize: 12, color: c.text },
+  receiptName: { fontFamily: fonts.semibold, fontSize: 12, color: c.text },
   receiptStatus: {
-    fontFamily: "Inter_400Regular",
-    fontSize: 10,
+    fontFamily: fonts.regular,
+    fontSize: 12,
     color: c.green,
   },
   removeReceipt: {
@@ -725,7 +710,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     marginTop: 14,
-    fontFamily: "Inter_400Regular",
+    fontFamily: fonts.regular,
     fontSize: 12,
     color: c.red,
   },
@@ -748,20 +733,20 @@ const styles = StyleSheet.create({
   checkboxChecked: { backgroundColor: c.brown },
   confirmText: {
     flex: 1,
-    fontFamily: "Inter_400Regular",
-    fontSize: 11,
+    fontFamily: fonts.regular,
+    fontSize: 12,
     color: c.text,
   },
   primaryButton: {
     minHeight: 48,
     marginTop: 16,
-    borderRadius: 10,
+    borderRadius: radius.pill,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: c.brown,
   },
   primaryButtonText: {
-    fontFamily: "Inter_700Bold",
+    fontFamily: fonts.semibold,
     fontSize: 13,
     color: c.white,
   },
@@ -772,14 +757,14 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginTop: 20,
     textAlign: "center",
-    fontFamily: "Inter_400Regular",
-    fontSize: 11,
+    fontFamily: fonts.regular,
+    fontSize: 12,
     lineHeight: 17,
     color: c.muted,
   },
   errorState: { flex: 1, padding: 22, justifyContent: "center", gap: 12 },
   bodyText: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: fonts.regular,
     fontSize: 14,
     lineHeight: 21,
     color: c.muted,
@@ -789,13 +774,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     borderWidth: 1,
     borderColor: c.border,
-    borderRadius: 10,
+    borderRadius: radius.pill,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: c.white,
   },
   secondaryButtonText: {
-    fontFamily: "Inter_700Bold",
+    fontFamily: fonts.semibold,
     color: c.brown,
     fontSize: 13,
   },
@@ -812,11 +797,11 @@ const styles = StyleSheet.create({
     borderRadius: 29,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#E3EDE3",
+    backgroundColor: palette.successSurface,
   },
   successTitle: {
-    fontFamily: "Inter_700Bold",
-    fontSize: 21,
+    fontFamily: fonts.semibold,
+    fontSize: 18,
     textAlign: "center",
     color: c.text,
   },

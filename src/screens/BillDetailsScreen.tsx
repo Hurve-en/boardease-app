@@ -8,13 +8,13 @@ import {
 } from "@/features/billing-history/model";
 import {
   historyColors as c,
-  historyFonts as f,
 } from "@/features/billing-history/theme";
 import {
   Inter_400Regular,
   Inter_700Bold,
   useFonts,
 } from "@expo-google-fonts/inter";
+import { fonts, palette, radius } from "@/constants/theme";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
@@ -86,7 +86,7 @@ export default function BillDetailsScreen() {
             accessibilityRole="button"
             accessibilityLabel="Go back"
           >
-            <Ionicons name="arrow-back" size={22} color={c.brown} />
+            <Ionicons name="arrow-back" size={20} color={palette.text} />
           </Pressable>
           <Text style={s.topTitle}>Bill details</Text>
         </View>
@@ -113,7 +113,7 @@ export default function BillDetailsScreen() {
           accessibilityRole="button"
           accessibilityLabel="Go back"
         >
-          <Ionicons name="arrow-back" size={22} color={c.brown} />
+          <Ionicons name="arrow-back" size={20} color={palette.text} />
         </Pressable>
         <Text style={s.topTitle}>Bill details</Text>
         <View style={s.avatar}>
@@ -135,14 +135,14 @@ export default function BillDetailsScreen() {
           <View>
             <Text style={s.month}>{billMonthLabel(bill.billingMonth)}</Text>
             <Text style={s.ref}>
-              {bill.billId.slice(0, 8).toUpperCase()} ·{" "}
+              {bill.billId.slice(0, 8).toUpperCase()},{" "}
               {tenant?.roomNumber
                 ? `Room ${tenant.roomNumber}`
                 : "No room assigned"}
             </Text>
           </View>
-          <Text style={[s.badge, bill.status === "paid" && s.badgePaid]}>
-            {statusLabels[bill.status].toUpperCase()}
+          <Text style={[s.badge, badgeTone[bill.status]]}>
+            {statusLabels[bill.status]}
           </Text>
         </View>
         {!tenant?.roomNumber ? (
@@ -181,7 +181,7 @@ export default function BillDetailsScreen() {
             value={`− ${formatMoney(paid)}`}
           />
           <View style={s.balance}>
-            <Text style={s.balanceLabel}>OUTSTANDING BALANCE</Text>
+            <Text style={s.balanceLabel}>Outstanding balance</Text>
             <Text style={s.balanceAmount}>
               {formatMoney(bill.outstandingBalance)}
             </Text>
@@ -215,11 +215,11 @@ export default function BillDetailsScreen() {
                 <Ionicons
                   name="checkmark-circle-outline"
                   size={21}
-                  color="#477452"
+                  color={palette.success}
                 />
               </View>
               <Text style={s.paymentMeta}>
-                {formatDate(payment.paymentDate)} · Recorded by{" "}
+                {formatDate(payment.paymentDate)}, recorded by{" "}
                 {payment.recordedBy ?? "your owner"}
               </Text>
             </View>
@@ -273,173 +273,98 @@ function MoneyRow({
   );
 }
 
+const badgeTone = {
+  paid: { backgroundColor: palette.successSurface, color: palette.success },
+  partial: { backgroundColor: palette.warningSurface, color: palette.warning },
+  unpaid: { backgroundColor: palette.dangerSurface, color: palette.danger },
+} as const;
+
 const s = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: c.background },
-  center: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: c.background,
-  },
+  screen: { flex: 1, backgroundColor: palette.canvas },
+  center: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: palette.canvas },
   topbar: {
-    minHeight: 58,
-    paddingHorizontal: 22,
+    minHeight: 52,
+    marginHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.border,
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
+    gap: 12,
   },
-  topTitle: { flex: 1, fontFamily: f.bold, fontSize: 16, color: c.text },
+  topTitle: { flex: 1, fontFamily: fonts.semibold, fontSize: 15, color: palette.text },
   avatar: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 32,
+    height: 32,
+    borderRadius: radius.pill,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: c.beige,
+    backgroundColor: palette.surfaceSelected,
   },
-  avatarText: { fontFamily: f.bold, fontSize: 11, color: c.brown },
-  content: {
-    paddingHorizontal: 22,
-    paddingTop: 18,
-    paddingBottom: 30,
-    width: "100%",
-    maxWidth: 600,
-    alignSelf: "center",
-  },
-  titleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 20,
-    gap: 10,
-  },
-  month: { fontFamily: f.bold, fontSize: 23, color: c.text },
-  ref: { fontFamily: f.regular, fontSize: 12, color: c.muted, marginTop: 4 },
+  avatarText: { fontFamily: fonts.semibold, fontSize: 12, color: palette.primary },
+  content: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 24, width: "100%", maxWidth: 600, alignSelf: "center" },
+  titleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 14, gap: 10 },
+  month: { fontFamily: fonts.semibold, fontSize: 22, letterSpacing: -0.4, color: palette.text },
+  ref: { fontFamily: fonts.regular, fontSize: 13, color: palette.muted, marginTop: 2 },
   badge: {
     overflow: "hidden",
-    borderRadius: 18,
-    paddingHorizontal: 11,
-    paddingVertical: 6,
-    backgroundColor: c.partial,
-    color: c.brown,
-    fontFamily: f.bold,
-    fontSize: 10,
+    borderRadius: radius.pill,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    fontFamily: fonts.semibold,
+    fontSize: 12,
   },
-  badgePaid: { backgroundColor: c.paid },
-  card: {
-    padding: 18,
-    borderWidth: 1,
-    borderColor: c.border,
-    borderRadius: 16,
-    backgroundColor: c.white,
-  },
-  moneyRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 14,
-    gap: 8,
-  },
-  moneyLabel: { fontFamily: f.regular, fontSize: 14, color: c.muted },
-  moneyValue: { fontFamily: f.regular, fontSize: 14, color: c.text },
-  strong: { fontFamily: f.bold, color: c.text, fontSize: 16 },
-  divider: { height: 1, backgroundColor: c.border, marginBottom: 15 },
-  balance: {
-    padding: 14,
-    marginTop: 5,
-    borderRadius: 10,
-    backgroundColor: c.beige,
-  },
-  balanceLabel: { fontFamily: f.regular, fontSize: 10, color: c.brown },
-  balanceAmount: {
-    fontFamily: f.bold,
-    fontSize: 24,
-    color: c.brown,
-    marginTop: 3,
-  },
-  balanceDue: {
-    fontFamily: f.regular,
-    fontSize: 11,
-    color: c.muted,
-    marginTop: 3,
-  },
-  sectionTitle: {
-    fontFamily: f.bold,
-    fontSize: 16,
-    color: c.text,
-    marginTop: 22,
-    marginBottom: 10,
-  },
+  card: { padding: 14, borderWidth: 1, borderColor: palette.border, borderRadius: radius.card, backgroundColor: palette.surface },
+  moneyRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10, gap: 8 },
+  moneyLabel: { fontFamily: fonts.regular, fontSize: 14, color: palette.muted },
+  moneyValue: { fontFamily: fonts.regular, fontSize: 14, color: palette.text, fontVariant: ["tabular-nums"] },
+  strong: { fontFamily: fonts.semibold, color: palette.text, fontSize: 15 },
+  divider: { height: 1, backgroundColor: palette.border, marginBottom: 10 },
+  balance: { padding: 12, marginTop: 4, borderRadius: radius.inset, backgroundColor: palette.surfaceSelected },
+  balanceLabel: { fontFamily: fonts.medium, fontSize: 12, color: palette.primary },
+  balanceAmount: { fontFamily: fonts.semibold, fontSize: 24, letterSpacing: -0.5, color: palette.primary, marginTop: 2, fontVariant: ["tabular-nums"] },
+  balanceDue: { fontFamily: fonts.regular, fontSize: 12, color: palette.muted, marginTop: 2 },
+  sectionTitle: { fontFamily: fonts.semibold, fontSize: 15, color: palette.text, marginTop: 20, marginBottom: 8 },
   paymentCard: {
-    backgroundColor: c.white,
+    backgroundColor: palette.surface,
     borderWidth: 1,
-    borderColor: c.border,
-    borderRadius: 14,
-    padding: 15,
-    marginBottom: 9,
+    borderColor: palette.border,
+    borderRadius: radius.card,
+    padding: 12,
+    marginBottom: 6,
   },
-  paymentTop: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  paymentAmount: { fontFamily: f.bold, fontSize: 18, color: c.text },
-  paymentMeta: {
-    fontFamily: f.regular,
-    fontSize: 12,
-    color: c.muted,
-    marginTop: 8,
-  },
-  footerNote: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 8,
-    marginTop: 15,
-  },
-  footerText: {
-    flex: 1,
-    fontFamily: f.regular,
-    fontSize: 12,
-    color: c.muted,
-    lineHeight: 18,
-  },
+  paymentTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  paymentAmount: { fontFamily: fonts.semibold, fontSize: 16, color: palette.text, fontVariant: ["tabular-nums"] },
+  paymentMeta: { fontFamily: fonts.regular, fontSize: 12, color: palette.muted, marginTop: 4 },
+  footerNote: { flexDirection: "row", alignItems: "flex-start", gap: 8, marginTop: 12 },
+  footerText: { flex: 1, fontFamily: fonts.regular, fontSize: 12, color: palette.muted, lineHeight: 18 },
   notice: {
-    margin: 22,
-    padding: 18,
-    borderRadius: 14,
-    backgroundColor: c.white,
-    gap: 9,
+    margin: 16,
+    padding: 16,
+    borderRadius: radius.card,
+    borderWidth: 1,
+    borderColor: palette.border,
+    backgroundColor: palette.surface,
+    gap: 8,
   },
-  muted: {
-    fontFamily: f.regular,
-    fontSize: 13,
-    color: c.muted,
-    lineHeight: 19,
-  },
-  retry: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: c.brown,
-    borderRadius: 8,
-  },
-  retryText: { fontFamily: f.bold, color: c.white, fontSize: 13 },
+  muted: { flex: 1, fontFamily: fonts.regular, fontSize: 13, color: palette.muted, lineHeight: 19 },
+  retry: { alignSelf: "flex-start", paddingHorizontal: 16, paddingVertical: 10, backgroundColor: palette.primary, borderRadius: radius.pill },
+  retryText: { fontFamily: fonts.semibold, color: palette.inverse, fontSize: 13 },
   roomNotice: {
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 8,
-    padding: 13,
-    marginBottom: 13,
-    backgroundColor: c.beige,
-    borderRadius: 11,
+    padding: 12,
+    marginBottom: 12,
+    backgroundColor: palette.surfaceMuted,
+    borderRadius: radius.card,
   },
   submitPaymentButton: {
-    marginTop: 16,
+    marginTop: 12,
     minHeight: 48,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 12,
-    backgroundColor: c.brown,
+    borderRadius: radius.pill,
+    backgroundColor: palette.primary,
   },
-  submitPaymentButtonText: { fontFamily: f.bold, color: c.white, fontSize: 14 },
+  submitPaymentButtonText: { fontFamily: fonts.semibold, color: palette.inverse, fontSize: 14 },
 });

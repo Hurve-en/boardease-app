@@ -1,4 +1,6 @@
 import { TenantTabBar } from "@/components/navigation/TenantTabBar";
+import LogoMark from "@/components/auth/LogoMark";
+import { fonts, palette, radius } from "@/constants/theme";
 import { FilterMenu } from "@/features/billing-history/FilterMenu";
 import { HistoryIcon } from "@/features/billing-history/HistoryIcon";
 import { UtilityChart } from "@/features/billing-history/UtilityChart";
@@ -20,7 +22,6 @@ import {
 } from "@/features/billing-history/model";
 import {
   historyColors as c,
-  historyFonts as f,
 } from "@/features/billing-history/theme";
 import {
   Inter_400Regular,
@@ -172,9 +173,7 @@ export default function BillingHistoryScreen({ onBillPress }: Props) {
       <View style={styles.container} aria-hidden={menu !== null} accessibilityElementsHidden={menu !== null} importantForAccessibility={menu !== null ? "no-hide-descendants" : "auto"}>
         <View style={styles.brandHeader}>
           <View style={styles.brand}>
-            <View style={styles.brandMark}>
-              <HistoryIcon name="brand" />
-            </View>
+            <LogoMark size={28} />
             <Text style={styles.brandName}>BoardEase</Text>
           </View>
           <View
@@ -199,7 +198,7 @@ export default function BillingHistoryScreen({ onBillPress }: Props) {
           ListHeaderComponent={
             <>
               {previewEnabled ? (
-                <Text style={styles.preview}>Design preview · Sample data</Text>
+                <Text style={styles.preview}>Design preview with sample data</Text>
               ) : null}
               <View style={styles.titleRow}>
                 <Text accessibilityRole="header" style={styles.pageTitle}>
@@ -227,7 +226,7 @@ export default function BillingHistoryScreen({ onBillPress }: Props) {
                         : null,
                     ]
                       .filter(Boolean)
-                      .join(" · ") || "Your bills and utility charges"
+                      .join(", ") || "Your bills and utility charges"
                   : "Your bills and utility charges"}
               </Text>
               {data ? <UtilityChart bills={utilities} /> : null}
@@ -371,7 +370,7 @@ function BillRow({
       ? bill.settledDate
         ? `Settled ${shortDate(bill.settledDate)}`
         : "Settled"
-      : `${formatMoney(bill.outstandingBalance)} left · Due ${shortDate(bill.dueDate)}`;
+      : `${formatMoney(bill.outstandingBalance)} left, due ${shortDate(bill.dueDate)}`;
   return (
     <Pressable
       accessibilityRole="button"
@@ -387,20 +386,8 @@ function BillRow({
         <Text style={styles.billDetail}>{detail}</Text>
       </View>
       <View style={styles.billActions}>
-        <View
-          style={[
-            styles.badge,
-            {
-              backgroundColor:
-                bill.status === "paid"
-                  ? c.paid
-                  : bill.status === "partial"
-                    ? c.partial
-                    : c.beige,
-            },
-          ]}
-        >
-          <Text style={styles.badgeText}>{statusLabels[bill.status]}</Text>
+        <View style={[styles.badge, badgeTone[bill.status].box]}>
+          <Text style={[styles.badgeText, badgeTone[bill.status].text]}>{statusLabels[bill.status]}</Text>
         </View>
         <HistoryIcon name="right" />
       </View>
@@ -408,136 +395,107 @@ function BillRow({
   );
 }
 
+const badgeTone = {
+  paid: { box: { backgroundColor: palette.successSurface }, text: { color: palette.success } },
+  partial: { box: { backgroundColor: palette.warningSurface }, text: { color: palette.warning } },
+  unpaid: { box: { backgroundColor: palette.dangerSurface }, text: { color: palette.danger } },
+} as const;
+
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: c.background },
+  screen: { flex: 1, backgroundColor: palette.canvas },
   loading: { flex: 1 },
   container: { flex: 1, width: "100%", maxWidth: 600, alignSelf: "center" },
   brandHeader: {
-    marginHorizontal: 20,
-    minHeight: 64,
-    paddingVertical: 12,
+    marginHorizontal: 16,
+    minHeight: 52,
+    paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: c.border,
+    borderBottomColor: palette.border,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     gap: 12,
   },
-  brand: { flexDirection: "row", alignItems: "center", gap: 10 },
-  brandMark: {
-    width: 34,
-    height: 34,
-    borderRadius: 8,
-    backgroundColor: c.brown,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  brandName: { fontFamily: f.bold, fontSize: 19, color: c.brown },
+  brand: { flexDirection: "row", alignItems: "center", gap: 8 },
+  brandName: { fontFamily: fonts.bold, fontSize: 17, letterSpacing: -0.3, color: palette.text },
   avatar: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 32,
+    height: 32,
+    borderRadius: radius.pill,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: c.beige,
+    backgroundColor: palette.surfaceSelected,
   },
-  avatarText: { fontFamily: f.bold, fontSize: 11, color: c.brown },
-  content: {
-    paddingHorizontal: 20,
-    paddingTop: 14,
-    paddingBottom: 24,
-    flexGrow: 1,
-  },
-  pageTitle: { fontFamily: f.bold, fontSize: 28, color: c.text },
+  avatarText: { fontFamily: fonts.semibold, fontSize: 12, color: palette.primary },
+  content: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 20, flexGrow: 1 },
+  pageTitle: { fontFamily: fonts.semibold, fontSize: 22, letterSpacing: -0.4, color: palette.text },
   titleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 8 },
-  context: {
-    fontFamily: f.regular,
-    fontSize: 13,
-    color: c.muted,
-    marginTop: 5,
-  },
-  preview: {
-    fontFamily: f.bold,
-    fontSize: 11,
-    color: c.brown,
-    marginBottom: 8,
-  },
+  context: { fontFamily: fonts.regular, fontSize: 13, color: palette.muted, marginTop: 2 },
+  preview: { fontFamily: fonts.medium, fontSize: 12, color: palette.warning, marginBottom: 8 },
   filters: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 8,
-    marginBottom: 6,
+    marginTop: 16,
+    marginBottom: 8,
   },
-  sectionTitle: { fontFamily: f.bold, fontSize: 17, color: c.text },
-  filterButtons: { flexDirection: "row", gap: 8, flexWrap: "wrap" },
+  sectionTitle: { fontFamily: fonts.semibold, fontSize: 15, color: palette.text },
+  filterButtons: { flexDirection: "row", gap: 6, flexWrap: "wrap" },
   filterButton: {
     flexDirection: "row",
-    gap: 7,
+    gap: 6,
     paddingHorizontal: 12,
-    minHeight: 48,
+    minHeight: 36,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: c.border,
-    borderRadius: 8,
-    backgroundColor: c.white,
+    borderColor: palette.border,
+    borderRadius: radius.pill,
+    backgroundColor: palette.surface,
   },
-  filterLabel: { fontFamily: f.bold, fontSize: 12, color: c.brown },
+  filterLabel: { fontFamily: fonts.medium, fontSize: 13, color: palette.text },
   bill: {
-    backgroundColor: c.white,
+    backgroundColor: palette.surface,
     borderWidth: 1,
-    borderColor: c.border,
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginBottom: 10,
-    minHeight: 76,
+    borderColor: palette.border,
+    borderRadius: radius.card,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    marginBottom: 8,
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
   },
-  billText: { flex: 1, gap: 3 },
-  billMonth: { fontFamily: f.bold, fontSize: 14, color: c.text },
-  billAmount: { fontFamily: f.bold, fontSize: 15, color: c.text },
-  billDetail: { fontFamily: f.regular, fontSize: 12, color: c.muted },
-  billActions: { flexDirection: "row", alignItems: "center", gap: 16 },
-  badge: {
-    minWidth: 62,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    alignItems: "center",
-  },
-  badgeText: { fontFamily: f.bold, fontSize: 11, color: c.brown },
+  billText: { flex: 1, gap: 2 },
+  billMonth: { fontFamily: fonts.medium, fontSize: 13, color: palette.muted },
+  billAmount: { fontFamily: fonts.semibold, fontSize: 16, color: palette.text, fontVariant: ["tabular-nums"] },
+  billDetail: { fontFamily: fonts.regular, fontSize: 12, color: palette.muted },
+  billActions: { flexDirection: "row", alignItems: "center", gap: 12 },
+  badge: { borderRadius: radius.pill, paddingHorizontal: 9, paddingVertical: 3, alignItems: "center" },
+  badgeText: { fontFamily: fonts.semibold, fontSize: 12 },
   pressed: { opacity: 0.7 },
   notice: {
-    padding: 20,
-    marginVertical: 12,
-    borderRadius: 14,
-    backgroundColor: c.white,
+    padding: 16,
+    marginVertical: 10,
+    borderRadius: radius.card,
+    backgroundColor: palette.surface,
     borderWidth: 1,
-    borderColor: c.border,
-    gap: 8,
+    borderColor: palette.border,
+    gap: 6,
   },
-  noticeTitle: { fontFamily: f.bold, fontSize: 16, color: c.text },
-  secondary: {
-    fontFamily: f.regular,
-    fontSize: 14,
-    color: c.muted,
-    lineHeight: 22,
-  },
+  noticeTitle: { fontFamily: fonts.semibold, fontSize: 15, color: palette.text },
+  secondary: { fontFamily: fonts.regular, fontSize: 13, color: palette.muted, lineHeight: 20 },
   retry: {
-    minHeight: 48,
+    minHeight: 40,
     alignSelf: "flex-start",
     justifyContent: "center",
     paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: c.brown,
-    marginTop: 4,
+    borderRadius: radius.pill,
+    backgroundColor: palette.primary,
+    marginTop: 6,
   },
-  retryText: { fontFamily: f.bold, fontSize: 14, color: c.white },
+  retryText: { fontFamily: fonts.semibold, fontSize: 13, color: palette.inverse },
   state: { paddingVertical: 40 },
 });
