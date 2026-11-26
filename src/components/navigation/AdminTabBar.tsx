@@ -1,3 +1,4 @@
+import { InboxTab } from "./InboxTab";
 import { fonts, palette } from "@/constants/theme";
 import { signOut } from "@/lib/auth";
 import { router } from "expo-router";
@@ -46,6 +47,7 @@ export function AdminTabBar({ active }: { active: "dashboard" | "payments" }) {
             selected={active === "payments"}
             onPress={() => active !== "payments" && router.replace("/admin-payments")}
           />
+          <InboxTab />
           <TabItem
             role="button"
             label={signingOut ? "Signing out…" : "Sign out"}

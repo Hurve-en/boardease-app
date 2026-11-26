@@ -1,3 +1,4 @@
+import { useLocalSearchParams } from "expo-router";
 import {AdminTabBar} from "@/components/navigation/AdminTabBar";
 import { palette, radius } from "@/constants/theme";
 import {AdminScreenHeader} from "@/components/navigation/AdminScreenHeader";
@@ -12,7 +13,7 @@ import {
 import {historyColors as c, historyFonts as f} from "@/features/billing-history/theme";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {Inter_400Regular, Inter_700Bold, useFonts} from "@expo-google-fonts/inter";
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {
   ActivityIndicator,
   Image,
@@ -91,6 +92,8 @@ function statusStyle(status: AdminBill["status"] | PaymentSubmission["status"]) 
 }
 
 export default function AdminPaymentsScreen() {
+  const { proof } = useLocalSearchParams<{ proof?: string }>();
+  const openedProof = useRef<string | undefined>(undefined);
   const [fontsLoaded, fontError] = useFonts({Inter_400Regular, Inter_700Bold});
   const [month, setMonth] = useState(currentMonth);
   const [filter, setFilter] = useState<BillStatusFilter>("all");
@@ -113,6 +116,13 @@ export default function AdminPaymentsScreen() {
     const controller = new AbortController();
     fetchAdminPayments(month, controller.signal)
       .then((result) => {
+        if (controller.signal.aborted) return;
+        if (proof && openedProof.current !== proof) {
+          const receipt = result.submissions.find(item => item.submissionId === proof);
+          if (receipt) openSubmission(receipt);
+          else setError("This payment proof is no longer available.");
+          openedProof.current = proof;
+        }
         setBills(result.bills);
         setSubmissions(result.submissions);
       })
@@ -125,7 +135,7 @@ export default function AdminPaymentsScreen() {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [month, attempt]);
+  }, [month, attempt, proof]);
 
   const filteredBills = useMemo(
     () => filter === "all" ? bills : bills.filter((bill) => bill.status === filter),

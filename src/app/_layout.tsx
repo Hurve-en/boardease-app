@@ -69,6 +69,10 @@ export default function RootLayout() {
 				<Stack.Screen name="payment-submission/[billId]" />
 			</Stack.Protected>
 
+			<Stack.Protected guard={authState.signedIn}>
+				<Stack.Screen name="notifications" />
+			</Stack.Protected>
+
 			<Stack.Protected guard={!authState.signedIn}>
 				<Stack.Screen name="index" />
 				<Stack.Screen name="login" />
