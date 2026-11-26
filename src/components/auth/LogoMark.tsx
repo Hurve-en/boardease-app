@@ -1,22 +1,17 @@
-import { colors } from "@/constants/theme";
-import { Ionicons } from "@expo/vector-icons";
-import { View } from "react-native";
+import { Image } from "expo-image";
 
 type Props = { size?: number };
 
+const ASPECT = 469 / 493;
+
 export default function LogoMark({ size = 36 }: Props) {
   return (
-    <View
-      style={{
-        width: size,
-        height: size,
-        borderRadius: size * 0.28,
-        backgroundColor: colors.brown,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <Ionicons name="home-outline" size={size * 0.55} color={colors.white} />
-    </View>
+    <Image
+      source={require("@/assets/brand/boardease-mark.png")}
+      style={{ width: size, height: size * ASPECT }}
+      contentFit="contain"
+      accessible={false}
+      alt=""
+    />
   );
 }

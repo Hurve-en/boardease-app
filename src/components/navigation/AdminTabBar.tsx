@@ -1,12 +1,12 @@
-import {historyColors as c, historyFonts as f} from "@/features/billing-history/theme";
-import {HistoryIcon} from "@/features/billing-history/HistoryIcon";
-import {signOut} from "@/lib/auth";
-import {router} from "expo-router";
-import {useState} from "react";
-import {Pressable, StyleSheet, Text, View} from "react-native";
-import {SafeAreaView} from "react-native-safe-area-context";
+import { fonts, palette } from "@/constants/theme";
+import { signOut } from "@/lib/auth";
+import { router } from "expo-router";
+import { useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { TabItem, tabBarStyles } from "./TabItem";
 
-export function AdminTabBar({active}: {active: "dashboard" | "payments"}) {
+export function AdminTabBar({ active }: { active: "dashboard" | "payments" }) {
   const [signingOut, setSigningOut] = useState(false);
   const [error, setError] = useState("");
 
@@ -25,46 +25,35 @@ export function AdminTabBar({active}: {active: "dashboard" | "payments"}) {
 
   return (
     <>
-      {error ? <Text accessibilityRole="alert" style={styles.error}>{error}</Text> : null}
-      <SafeAreaView edges={["bottom"]} style={styles.bar}>
-        <View style={styles.tabs} accessibilityRole="tablist" accessibilityLabel="Admin navigation">
-          <Pressable
-            accessibilityRole="tab"
-            accessibilityState={{selected: active === "dashboard"}}
+      {error ? (
+        <Text accessibilityRole="alert" style={styles.error}>
+          {error}
+        </Text>
+      ) : null}
+      <SafeAreaView edges={["bottom"]} style={tabBarStyles.bar}>
+        <View style={tabBarStyles.tabs} accessibilityRole="tablist" accessibilityLabel="Admin navigation">
+          <TabItem
+            label="Dashboard"
+            icon="grid-outline"
+            activeIcon="grid"
+            selected={active === "dashboard"}
             onPress={() => active !== "dashboard" && router.replace("/admin")}
-            style={({pressed}) => [styles.tab, pressed && styles.pressed]}
-          >
-            <View style={[styles.icon, active === "dashboard" && styles.selected]}>
-              <HistoryIcon name="home" />
-            </View>
-            <Text style={[styles.label, active === "dashboard" && styles.selectedLabel]}>Dashboard</Text>
-          </Pressable>
-
-          <Pressable
-            accessibilityRole="tab"
-            accessibilityState={{selected: active === "payments"}}
+          />
+          <TabItem
+            label="Payments"
+            icon="card-outline"
+            activeIcon="card"
+            selected={active === "payments"}
             onPress={() => active !== "payments" && router.replace("/admin-payments")}
-            style={({pressed}) => [styles.tab, pressed && styles.pressed]}
-          >
-            <View style={[styles.icon, active === "payments" && styles.selected]}>
-              <HistoryIcon name="history" />
-            </View>
-            <Text style={[styles.label, active === "payments" && styles.selectedLabel]}>Payments</Text>
-          </Pressable>
-
-          <Pressable
-            accessibilityRole="button"
+          />
+          <TabItem
+            role="button"
+            label={signingOut ? "Signing out…" : "Sign out"}
             accessibilityLabel={signingOut ? "Signing out" : "Sign out"}
-            accessibilityState={{disabled: signingOut}}
+            icon="log-out-outline"
             disabled={signingOut}
             onPress={() => void handleSignOut()}
-            style={({pressed}) => [styles.tab, pressed && styles.pressed]}
-          >
-            <View style={styles.icon}>
-              <HistoryIcon name="account" />
-            </View>
-            <Text style={styles.label}>{signingOut ? "Signing out…" : "Sign out"}</Text>
-          </Pressable>
+          />
         </View>
       </SafeAreaView>
     </>
@@ -72,13 +61,12 @@ export function AdminTabBar({active}: {active: "dashboard" | "payments"}) {
 }
 
 const styles = StyleSheet.create({
-  bar: {backgroundColor: c.white, borderTopWidth: 1, borderTopColor: c.border},
-  tabs: {width: "100%", maxWidth: 600, alignSelf: "center", flexDirection: "row", paddingVertical: 8},
-  tab: {flex: 1, minHeight: 56, alignItems: "center", justifyContent: "center", gap: 5},
-  icon: {width: 44, height: 26, borderRadius: 16, alignItems: "center", justifyContent: "center"},
-  selected: {backgroundColor: c.beige},
-  label: {fontFamily: f.regular, fontSize: 11, color: c.muted},
-  selectedLabel: {fontFamily: f.bold, color: c.brown},
-  pressed: {opacity: 0.7},
-  error: {paddingVertical: 8, textAlign: "center", fontFamily: f.regular, fontSize: 12, color: "#9A3529", backgroundColor: c.white},
+  error: {
+    paddingVertical: 8,
+    textAlign: "center",
+    fontFamily: fonts.regular,
+    fontSize: 12,
+    color: palette.danger,
+    backgroundColor: palette.dangerSurface,
+  },
 });

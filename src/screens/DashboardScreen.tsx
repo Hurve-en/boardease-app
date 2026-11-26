@@ -4,7 +4,9 @@ import {
   billMonthLabel,
   type BillingHistory,
 } from "@/features/billing-history/model";
-import { historyColors, historyFonts } from "@/features/billing-history/theme";
+import LogoMark from "@/components/auth/LogoMark";
+import { fonts, palette, radius } from "@/constants/theme";
+import { historyColors } from "@/features/billing-history/theme";
 import { hasSession, signOut } from "@/lib/auth";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Redirect, router } from "expo-router";
@@ -25,6 +27,8 @@ const colors = {
   bg: historyColors.background,
   card: historyColors.white,
 };
+
+const STATUS_LABEL = { paid: "Paid", partial: "Partial", unpaid: "Unpaid" } as const;
 
 const currency = new Intl.NumberFormat("en-PH", {
   style: "currency",
@@ -168,13 +172,7 @@ export default function DashboardScreen() {
               <View style={styles.topBar}>
                 <View>
                   <View style={styles.brandLine}>
-                    <View style={styles.brandIcon}>
-                      <Ionicons
-                        name="home-outline"
-                        size={22}
-                        color={colors.white}
-                      />
-                    </View>
+                    <LogoMark size={28} />
                     <Text style={styles.brandName}>BoardEase</Text>
                   </View>
                 </View>
@@ -190,8 +188,8 @@ export default function DashboardScreen() {
                 >
                   <Ionicons
                     name="log-out-outline"
-                    size={21}
-                    color={colors.brown}
+                    size={18}
+                    color={palette.textSecondary}
                   />
                 </Pressable>
               </View>
@@ -200,8 +198,8 @@ export default function DashboardScreen() {
                 <View style={styles.errorCard} accessibilityRole="alert">
                   <Ionicons
                     name="cloud-offline-outline"
-                    size={22}
-                    color={colors.brown}
+                    size={19}
+                    color={palette.danger}
                   />
                   <View style={styles.errorCopy}>
                     <Text style={styles.errorText}>{error}</Text>
@@ -218,7 +216,7 @@ export default function DashboardScreen() {
               {tenant ? (
                 <View style={styles.greeting}>
                   <Text style={styles.title}>
-                    Hi, {tenant.name.split(" ")[0]} 👋
+                    Hi, {tenant.name.split(" ")[0]}
                   </Text>
                   <Text style={styles.context}>
                     {[
@@ -226,7 +224,7 @@ export default function DashboardScreen() {
                       tenant.roomNumber ? `Room ${tenant.roomNumber}` : null,
                     ]
                       .filter(Boolean)
-                      .join(" · ") || "Your tenant account"}
+                      .join(", ") || "Your tenant account"}
                   </Text>
                 </View>
               ) : null}
@@ -249,22 +247,24 @@ export default function DashboardScreen() {
                 </View>
               ) : null}
 
-              <View style={styles.sectionHeading}>
-                <Text style={styles.sectionTitle}>Outstanding balance</Text>
-              </View>
               {nextBill ? (
                 <View style={styles.heroCard}>
                   <View style={styles.heroTop}>
                     <Text style={styles.summaryLabel}>Outstanding balance</Text>
-                    <Text style={styles.status}>
-                      {nextBill.status.toUpperCase()}
+                    <Text
+                      style={[
+                        styles.status,
+                        nextBill.status === "partial" ? styles.statusPartial : styles.statusUnpaid,
+                      ]}
+                    >
+                      {STATUS_LABEL[nextBill.status]}
                     </Text>
                   </View>
                   <Text style={styles.summaryAmount}>
                     {currency.format(nextBill.outstandingBalance)}
                   </Text>
                   <Text style={styles.summaryHint}>
-                    {nextBill.name} · Due {formatDueDate(nextBill.dueDate)}
+                    {nextBill.name} bill, due {formatDueDate(nextBill.dueDate)}
                   </Text>
                   <Pressable
                     accessibilityRole="button"
@@ -279,12 +279,12 @@ export default function DashboardScreen() {
                       pressed && styles.pressed,
                     ]}
                   >
+                    <Text style={styles.viewBillText}>View bill</Text>
                     <Ionicons
                       name="arrow-forward"
-                      size={17}
-                      color={colors.brown}
+                      size={15}
+                      color={palette.inverse}
                     />
-                    <Text style={styles.viewBillText}>View current bill</Text>
                   </Pressable>
                 </View>
               ) : (
@@ -292,7 +292,7 @@ export default function DashboardScreen() {
                   <Ionicons
                     name="checkmark-circle-outline"
                     size={26}
-                    color={colors.brown}
+                    color={palette.success}
                   />
                   <Text style={styles.emptyTitle}>
                     You&apos;re all caught up
@@ -325,7 +325,7 @@ export default function DashboardScreen() {
                 </View>
               ) : null}
               <Text style={[styles.sectionTitle, styles.historyTitle]}>
-                Bill history
+                Recent bills
               </Text>
             </View>
           }
@@ -372,247 +372,130 @@ export default function DashboardScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
-  safeArea: { flex: 1, backgroundColor: colors.bg },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.bg,
-    padding: 24,
-  },
-  loadingText: { marginTop: 12, color: colors.muted, fontSize: 14 },
-  content: {
-    padding: 24,
-    paddingBottom: 32,
-    maxWidth: 600,
-    width: "100%",
-    alignSelf: "center",
-  },
+  screen: { flex: 1, backgroundColor: palette.canvas },
+  safeArea: { flex: 1, backgroundColor: palette.canvas },
+  centered: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: palette.canvas, padding: 24 },
+  loadingText: { marginTop: 12, color: palette.muted, fontFamily: fonts.regular, fontSize: 14 },
+  content: { padding: 16, paddingBottom: 24, maxWidth: 600, width: "100%", alignSelf: "center" },
   topBar: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 24,
+    paddingBottom: 10,
+    marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.border,
   },
-  eyebrow: {
-    color: colors.muted,
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 1.5,
-  },
-  title: {
-    color: colors.text,
-    fontSize: 25,
-    fontFamily: historyFonts.bold,
-    marginTop: 4,
-  },
-  brandLine: { flexDirection: "row", alignItems: "center", gap: 10 },
-  brandIcon: {
+  title: { color: palette.text, fontSize: 22, letterSpacing: -0.4, fontFamily: fonts.semibold },
+  brandLine: { flexDirection: "row", alignItems: "center", gap: 8 },
+  brandName: { color: palette.text, fontSize: 17, letterSpacing: -0.3, fontFamily: fonts.bold },
+  greeting: { marginBottom: 14 },
+  context: { color: palette.muted, fontFamily: fonts.regular, fontSize: 13, marginTop: 2 },
+  logout: {
     width: 36,
     height: 36,
-    borderRadius: 9,
-    backgroundColor: colors.brown,
     alignItems: "center",
     justifyContent: "center",
-  },
-  brandName: {
-    color: colors.brown,
-    fontSize: 20,
-    fontFamily: historyFonts.bold,
-  },
-  greeting: { marginBottom: 20 },
-  context: {
-    color: colors.muted,
-    fontFamily: historyFonts.regular,
-    fontSize: 13,
-    marginTop: 4,
-  },
-  logout: {
-    width: 42,
-    height: 42,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 21,
-    backgroundColor: colors.card,
+    borderRadius: radius.control,
+    borderWidth: 1,
+    borderColor: palette.border,
+    backgroundColor: palette.surface,
   },
   pressed: { opacity: 0.65 },
   errorCard: {
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 10,
-    padding: 14,
-    marginBottom: 16,
-    borderRadius: 14,
-    backgroundColor: "#F4DCD2",
+    padding: 12,
+    marginBottom: 12,
+    borderRadius: radius.card,
+    backgroundColor: palette.dangerSurface,
   },
   errorCopy: { flex: 1 },
-  errorText: { color: colors.text, fontSize: 13, lineHeight: 19 },
-  retry: { color: colors.brown, fontSize: 13, fontWeight: "700", marginTop: 6 },
-  summaryCard: {
-    padding: 20,
-    borderRadius: 18,
-    backgroundColor: colors.brown,
-  },
-  summaryLabel: {
-    color: "#EAD9C9",
-    fontSize: 12,
-    fontFamily: historyFonts.regular,
-  },
-  summaryAmount: {
-    color: colors.white,
-    fontSize: 35,
-    fontFamily: historyFonts.regular,
-    marginTop: 12,
-  },
-  summaryHint: {
-    color: "#EAD9C9",
-    fontSize: 12,
-    marginTop: 10,
-    fontFamily: historyFonts.regular,
-  },
-  heroCard: { padding: 21, borderRadius: 18, backgroundColor: colors.brown },
-  heroTop: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
+  errorText: { color: palette.danger, fontFamily: fonts.regular, fontSize: 13, lineHeight: 19 },
+  retry: { color: palette.primary, fontFamily: fonts.semibold, fontSize: 13, marginTop: 6 },
+  summaryLabel: { color: palette.text, fontSize: 13, fontFamily: fonts.medium },
+  summaryAmount: { color: palette.text, fontSize: 30, letterSpacing: -0.8, fontFamily: fonts.medium, marginTop: 8, fontVariant: ["tabular-nums"] },
+  summaryHint: { color: palette.muted, fontSize: 13, marginTop: 4, fontFamily: fonts.regular },
+  heroCard: { padding: 14, borderRadius: radius.card, backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.border },
+  heroTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   status: {
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    backgroundColor: colors.partial,
-    color: colors.brown,
-    fontSize: 10,
+    borderRadius: radius.pill,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    fontSize: 12,
     overflow: "hidden",
-    fontWeight: "700",
+    fontFamily: fonts.semibold,
   },
+  statusPartial: { backgroundColor: palette.warningSurface, color: palette.warning },
+  statusUnpaid: { backgroundColor: palette.dangerSurface, color: palette.danger },
   viewBill: {
-    marginTop: 18,
-    minHeight: 46,
-    borderRadius: 9,
-    backgroundColor: colors.white,
+    marginTop: 14,
+    minHeight: 44,
+    borderRadius: radius.pill,
+    backgroundColor: palette.primary,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
-    gap: 9,
+    gap: 8,
   },
-  viewBillText: {
-    color: colors.brown,
-    fontFamily: historyFonts.bold,
-    fontSize: 13,
-  },
+  viewBillText: { color: palette.inverse, fontFamily: fonts.semibold, fontSize: 14 },
   glance: {
-    marginTop: 20,
-    padding: 17,
-    borderRadius: 16,
+    marginTop: 10,
+    padding: 14,
+    borderRadius: radius.card,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.white,
-    gap: 14,
+    borderColor: palette.border,
+    backgroundColor: palette.surface,
+    gap: 10,
   },
-  glanceRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  glanceAmount: {
-    color: colors.text,
-    fontFamily: historyFonts.bold,
-    fontSize: 13,
-  },
+  glanceRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  glanceAmount: { color: palette.text, fontFamily: fonts.semibold, fontSize: 14, fontVariant: ["tabular-nums"] },
   roomNotice: {
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 10,
-    padding: 14,
-    marginBottom: 18,
-    borderRadius: 14,
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
+    padding: 12,
+    marginBottom: 12,
+    borderRadius: radius.card,
+    backgroundColor: palette.surfaceMuted,
   },
-  roomNoticeTitle: {
-    color: colors.text,
-    fontFamily: historyFonts.bold,
-    fontSize: 14,
-  },
-  roomNoticeText: {
-    color: colors.muted,
-    fontFamily: historyFonts.regular,
-    fontSize: 12,
-    lineHeight: 18,
-    marginTop: 4,
-  },
-  sectionHeading: { marginTop: 28, marginBottom: 12 },
-  sectionTitle: {
-    color: colors.text,
-    fontSize: 17,
-    fontFamily: historyFonts.bold,
-  },
-  nextBillCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 15,
-    borderRadius: 16,
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  billIcon: {
-    width: 44,
-    height: 44,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 12,
-    backgroundColor: colors.card,
-  },
-  nextBillCopy: { flex: 1, marginLeft: 12 },
-  billName: { color: colors.text, fontSize: 15, fontWeight: "600" },
-  dueDate: { color: colors.muted, fontSize: 12, marginTop: 4 },
-  billAmount: { color: colors.text, fontSize: 15, fontWeight: "700" },
+  roomNoticeTitle: { color: palette.text, fontFamily: fonts.semibold, fontSize: 14 },
+  roomNoticeText: { color: palette.muted, fontFamily: fonts.regular, fontSize: 13, lineHeight: 18, marginTop: 2 },
+  sectionTitle: { color: palette.text, fontSize: 15, fontFamily: fonts.semibold },
+  billName: { color: palette.text, fontSize: 14, fontFamily: fonts.medium },
+  dueDate: { color: palette.muted, fontFamily: fonts.regular, fontSize: 13 },
   emptyCard: {
     alignItems: "center",
-    padding: 24,
-    borderRadius: 16,
-    backgroundColor: colors.white,
+    padding: 20,
+    borderRadius: radius.card,
+    backgroundColor: palette.surface,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: palette.border,
   },
-  emptyTitle: {
-    color: colors.text,
-    fontSize: 15,
-    fontWeight: "700",
-    marginTop: 10,
-  },
-  emptyText: {
-    color: colors.muted,
-    fontSize: 13,
-    textAlign: "center",
-    marginTop: 5,
-  },
-  historyTitle: { marginTop: 28, marginBottom: 12 },
+  emptyTitle: { color: palette.text, fontSize: 15, fontFamily: fonts.semibold, marginTop: 8 },
+  emptyText: { color: palette.muted, fontFamily: fonts.regular, fontSize: 13, textAlign: "center", marginTop: 4 },
+  historyTitle: { marginTop: 20, marginBottom: 8 },
   historyRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 13,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    paddingVertical: 11,
+    paddingHorizontal: 12,
+    marginBottom: 6,
+    borderRadius: radius.card,
+    borderWidth: 1,
+    borderColor: palette.border,
+    backgroundColor: palette.surface,
   },
   historyIcon: {
-    width: 36,
-    height: 36,
+    width: 32,
+    height: 32,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 10,
-    backgroundColor: colors.card,
+    borderRadius: radius.control,
+    backgroundColor: palette.surfaceSelected,
   },
-  historyCopy: { flex: 1, marginLeft: 11 },
-  historyAmount: { color: colors.text, fontSize: 14, fontWeight: "600" },
-  pullHint: {
-    color: colors.muted,
-    fontSize: 12,
-    textAlign: "center",
-    marginTop: 20,
-  },
+  historyCopy: { flex: 1, marginLeft: 10, gap: 2 },
+  historyAmount: { color: palette.text, fontSize: 14, fontFamily: fonts.semibold, fontVariant: ["tabular-nums"] },
+  pullHint: { color: palette.muted, fontFamily: fonts.regular, fontSize: 12, textAlign: "center", marginTop: 14 },
 });

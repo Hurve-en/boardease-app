@@ -1,7 +1,16 @@
-// Verified mobile v2 Figma values, isolated from the existing authentication palette.
+import { fonts, palette } from "@/constants/theme";
+
 export const historyColors = {
-  background: "#F7F4EE", brown: "#583E30", text: "#27211D", muted: "#675C52",
-  beige: "#EDE2D5", border: "#E6DDD2", white: "#FFFFFF", partial: "#F4E8CF",
-  paid: "#E3EDE3", scrim: "rgba(39,33,29,0.4)",
+  background: palette.canvas,
+  brown: palette.primary,
+  text: palette.text,
+  muted: palette.muted,
+  beige: palette.surfaceSelected,
+  border: palette.border,
+  white: palette.surface,
+  partial: palette.warningSurface,
+  paid: palette.successSurface,
+  scrim: palette.scrim,
 };
-export const historyFonts = { regular: "Inter_400Regular", bold: "Inter_700Bold" };
+
+export const historyFonts = { regular: fonts.regular, bold: fonts.semibold };

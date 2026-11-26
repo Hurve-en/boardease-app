@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { palette } from "@/constants/theme";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { SecurityForm, securityStyles as styles } from "./SecurityForm";
 import { passwordProblem } from "./model";
@@ -49,7 +50,7 @@ export function ChangePasswordForm({ onClose, onBusyChange }: { onClose: (succes
           hitSlop={8}
           style={({ pressed }) => [styles.visibilityButton, pressed && styles.pressed]}
         >
-          <Ionicons name={visibleFields[field.label] ? "eye-off-outline" : "eye-outline"} size={20} color="#675C52" />
+          <Ionicons name={visibleFields[field.label] ? "eye-off-outline" : "eye-outline"} size={20} color={palette.muted} />
         </Pressable>
       </View>
     </View>)}

@@ -1,11 +1,13 @@
-import { HistoryIcon } from "@/features/billing-history/HistoryIcon";
-import {
-  historyColors as c,
-  historyFonts as f,
-} from "@/features/billing-history/theme";
 import { router } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { TabItem, tabBarStyles } from "./TabItem";
+
+const tabs = [
+  { key: "home", label: "Home", href: "/home", icon: "home-outline", activeIcon: "home" },
+  { key: "history", label: "History", href: "/history", icon: "receipt-outline", activeIcon: "receipt" },
+  { key: "account", label: "Account", href: "/account", icon: "person-outline", activeIcon: "person" },
+] as const;
 
 export function TenantTabBar({
   active,
@@ -17,82 +19,25 @@ export function TenantTabBar({
   return (
     <SafeAreaView
       edges={["bottom"]}
-      style={styles.bar}
+      style={tabBarStyles.bar}
       aria-hidden={hidden}
       accessibilityElementsHidden={hidden}
       importantForAccessibility={hidden ? "no-hide-descendants" : "auto"}
     >
-      <View
-        style={styles.tabs}
-        accessibilityRole="tablist"
-        accessibilityLabel="Main navigation"
-      >
-        {(["home", "history", "account"] as const).map((tab) => (
-          <Pressable
-            key={tab}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: active === tab }}
-            aria-selected={active === tab}
+      <View style={tabBarStyles.tabs} accessibilityRole="tablist" accessibilityLabel="Main navigation">
+        {tabs.map((tab) => (
+          <TabItem
+            key={tab.key}
+            label={tab.label}
+            icon={tab.icon}
+            activeIcon={tab.activeIcon}
+            selected={active === tab.key}
             onPress={() => {
-              if (active !== tab)
-                router.replace(
-                  tab === "home"
-                    ? "/home"
-                    : tab === "history"
-                      ? "/history"
-                      : "/account",
-                );
+              if (active !== tab.key) router.replace(tab.href);
             }}
-            style={({ pressed }) => [styles.tab, pressed && styles.pressed]}
-          >
-            <View style={[styles.icon, active === tab && styles.selected]}>
-              <HistoryIcon name={tab} />
-            </View>
-            <Text
-              style={[styles.label, active === tab && styles.selectedLabel]}
-            >
-              {tab === "home"
-                ? "Home"
-                : tab === "history"
-                  ? "History"
-                  : "Account"}
-            </Text>
-          </Pressable>
+          />
         ))}
       </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  bar: {
-    backgroundColor: c.white,
-    borderTopWidth: 1,
-    borderTopColor: c.border,
-  },
-  tabs: {
-    width: "100%",
-    maxWidth: 600,
-    alignSelf: "center",
-    flexDirection: "row",
-    paddingVertical: 8,
-  },
-  tab: {
-    flex: 1,
-    minHeight: 56,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 5,
-  },
-  icon: {
-    width: 44,
-    height: 26,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  selected: { backgroundColor: c.beige },
-  label: { fontFamily: f.regular, fontSize: 11, color: c.muted },
-  selectedLabel: { fontFamily: f.bold, color: c.brown },
-  pressed: { opacity: 0.7 },
-});

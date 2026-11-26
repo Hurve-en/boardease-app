@@ -1,4 +1,4 @@
-import { colors } from "@/constants/theme";
+import { fonts, palette, radius } from "@/constants/theme";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, TextInputProps, View } from "react-native";
@@ -6,32 +6,44 @@ import { Pressable, StyleSheet, Text, TextInput, TextInputProps, View } from "re
 type Props = TextInputProps & {
   label: string;
   hint?: string;
+  hideLabel?: boolean;
 };
 
-export default function TextField({ label, hint, style, ...rest }: Props) {
+export default function TextField({ label, hint, hideLabel = false, style, ...rest }: Props) {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [focused, setFocused] = useState(false);
   const isPassword = Boolean(rest.secureTextEntry);
 
   return (
-    <View style={styles.wrap}>
-      <Text style={styles.label}>{label}</Text>
-      <View style={isPassword ? styles.passwordWrap : undefined}>
+    <View style={hideLabel ? styles.wrapCompact : styles.wrap}>
+      {hideLabel ? null : <Text style={styles.label}>{label}</Text>}
+      <View style={styles.field}>
         <TextInput
-          placeholderTextColor={colors.muted}
-          style={[styles.input, isPassword && styles.passwordInput, style]}
+          accessibilityLabel={label}
+          placeholderTextColor={palette.muted}
           {...rest}
+          placeholder={rest.placeholder ?? (hideLabel ? label : undefined)}
+          onFocus={(event) => {
+            setFocused(true);
+            rest.onFocus?.(event);
+          }}
+          onBlur={(event) => {
+            setFocused(false);
+            rest.onBlur?.(event);
+          }}
+          style={[styles.input, focused && styles.inputFocused, isPassword && styles.passwordInput, style]}
           secureTextEntry={isPassword ? !passwordVisible : rest.secureTextEntry}
         />
         {isPassword ? (
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={passwordVisible ? `Hide ${label.toLowerCase()}` : `Show ${label.toLowerCase()}`}
-            accessibilityState={{ disabled: false }}
+            accessibilityState={{ selected: passwordVisible }}
             onPress={() => setPasswordVisible((visible) => !visible)}
             style={({ pressed }) => [styles.visibilityButton, pressed && styles.pressed]}
             hitSlop={8}
           >
-            <Ionicons name={passwordVisible ? "eye-off-outline" : "eye-outline"} size={20} color={colors.muted} />
+            <Ionicons name={passwordVisible ? "eye-off-outline" : "eye-outline"} size={19} color={palette.muted} />
           </Pressable>
         ) : null}
       </View>
@@ -41,21 +53,32 @@ export default function TextField({ label, hint, style, ...rest }: Props) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { marginTop: 20 },
-  label: { marginBottom: 8, fontSize: 14, fontWeight: "600", color: colors.text },
+  wrap: { marginTop: 16 },
+  wrapCompact: { marginTop: 12 },
+  label: { marginBottom: 6, marginLeft: 4, fontSize: 13, fontFamily: fonts.medium, color: palette.text },
+  field: { justifyContent: "center" },
   input: {
     height: 48,
-    borderRadius: 10,
-    paddingHorizontal: 14,
+    borderRadius: radius.pill,
+    paddingHorizontal: 20,
     fontSize: 15,
-    backgroundColor: colors.white,
+    fontFamily: fonts.regular,
+    backgroundColor: palette.surfaceMuted,
     borderWidth: 1,
-    borderColor: colors.border,
-    color: colors.text,
+    borderColor: "transparent",
+    color: palette.text,
   },
-  passwordWrap: { position: "relative", justifyContent: "center" },
-  passwordInput: { paddingRight: 48 },
-  visibilityButton: { position: "absolute", right: 12, minWidth: 32, height: 40, alignItems: "center", justifyContent: "center" },
-  pressed: { opacity: 0.65 },
-  hint: { marginTop: 8, fontSize: 12, color: colors.muted },
+  inputFocused: { backgroundColor: palette.surface, borderColor: palette.primary },
+  passwordInput: { paddingRight: 52 },
+  visibilityButton: {
+    position: "absolute",
+    right: 6,
+    width: 40,
+    height: 40,
+    borderRadius: radius.pill,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  pressed: { backgroundColor: palette.surface },
+  hint: { marginTop: 6, marginLeft: 4, fontSize: 12, fontFamily: fonts.regular, color: palette.muted },
 });

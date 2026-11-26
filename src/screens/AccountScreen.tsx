@@ -16,6 +16,8 @@ import {
   Inter_700Bold,
   useFonts,
 } from "@expo-google-fonts/inter";
+import LogoMark from "@/components/auth/LogoMark";
+import { fonts, palette, radius } from "@/constants/theme";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -201,9 +203,7 @@ export default function AccountScreen() {
           }
         >
           <View style={styles.header}>
-            <View style={styles.mark}>
-              <HistoryIcon name="brand" />
-            </View>
+            <LogoMark size={28} />
             <Text style={styles.brand}>BoardEase</Text>
             <View style={styles.headerAvatar} accessible={false}>
               <Text style={styles.headerInitials}>{avatar}</Text>
@@ -282,7 +282,7 @@ export default function AccountScreen() {
                 </Text>
                 <Text style={styles.body}>
                   {data.owner?.name
-                    ? `${data.owner.name} · Boarding-house owner`
+                    ? `${data.owner.name}, boarding-house owner`
                     : "Owner information unavailable"}
                 </Text>
               </View>
@@ -457,55 +457,48 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 600,
     alignSelf: "center",
-    paddingHorizontal: 20,
-    paddingBottom: 24,
+    paddingHorizontal: 16,
+    paddingBottom: 20,
   },
   header: {
-    minHeight: 64,
+    minHeight: 52,
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    paddingVertical: 12,
+    gap: 8,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: c.border,
   },
-  mark: {
-    width: 34,
-    height: 34,
-    borderRadius: 8,
-    backgroundColor: c.brown,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  brand: { fontFamily: f.bold, fontSize: 19, color: c.brown },
+  brand: { fontFamily: fonts.bold, fontSize: 17, letterSpacing: -0.3, color: palette.text },
   headerAvatar: {
     marginLeft: "auto",
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 32,
+    height: 32,
+    borderRadius: radius.pill,
     backgroundColor: c.beige,
     alignItems: "center",
     justifyContent: "center",
   },
-  headerInitials: { fontFamily: f.bold, fontSize: 11, color: c.brown },
-  title: { fontFamily: f.bold, fontSize: 28, color: c.text, marginTop: 16 },
+  headerInitials: { fontFamily: fonts.semibold, fontSize: 12, color: palette.primary },
+  title: { fontFamily: fonts.semibold, fontSize: 22, letterSpacing: -0.4, color: c.text, marginTop: 14 },
   subtitle: {
     fontFamily: f.regular,
     fontSize: 13,
     color: c.muted,
-    marginTop: 5,
+    marginTop: 2,
   },
   profileCard: {
-    minHeight: 94,
-    padding: 18,
-    marginTop: 24,
+    minHeight: 80,
+    padding: 14,
+    marginTop: 14,
+    marginBottom: 8,
     backgroundColor: c.white,
     borderWidth: 1,
     borderColor: c.border,
-    borderRadius: 14,
+    borderRadius: radius.card,
     flexDirection: "row",
     alignItems: "center",
-    gap: 16,
+    gap: 12,
   },
   avatar: {
     width: 48,
@@ -516,18 +509,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   avatarText: { fontFamily: f.bold, fontSize: 13, color: c.brown },
-  nameInput: { minHeight: 48, borderWidth: 1, borderColor: c.border, borderRadius: 8, paddingHorizontal: 12, color: c.text },
+  nameInput: { minHeight: 44, borderWidth: 1, borderColor: "transparent", borderRadius: radius.pill, paddingHorizontal: 16, color: c.text, fontFamily: fonts.regular, backgroundColor: palette.surfaceMuted },
   profileText: { flex: 1, gap: 4 },
-  profileName: { fontFamily: f.bold, fontSize: 17, color: c.text },
+  profileName: { fontFamily: fonts.semibold, fontSize: 16, color: c.text },
   card: {
-    padding: 16,
+    padding: 14,
     backgroundColor: c.white,
     borderWidth: 1,
     borderColor: c.border,
-    borderRadius: 14,
+    borderRadius: radius.card,
     gap: 6,
   },
-  cardTitle: { fontFamily: f.bold, fontSize: 16, color: c.text },
+  cardTitle: { fontFamily: fonts.semibold, fontSize: 15, color: c.text },
   body: {
     fontFamily: f.regular,
     fontSize: 13,
@@ -537,36 +530,37 @@ const styles = StyleSheet.create({
   },
   securityRow: { marginTop: 12 },
   sectionTitle: {
-    fontFamily: f.bold,
-    fontSize: 17,
+    fontFamily: fonts.semibold,
+    fontSize: 15,
     color: c.text,
-    marginTop: 28,
-    marginBottom: 12,
+    marginTop: 20,
+    marginBottom: 8,
   },
   action: {
     flexDirection: "row",
     gap: 12,
     backgroundColor: c.white,
-    minHeight: 48,
-    padding: 14,
+    minHeight: 44,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: c.border,
-    borderRadius: 12,
+    borderRadius: radius.pill,
     alignItems: "center",
     justifyContent: "center",
   },
   actionText: {
-    fontFamily: f.bold,
+    fontFamily: fonts.semibold,
     fontSize: 14,
-    color: c.brown,
+    color: palette.text,
     flexShrink: 1,
   },
   rowLabel: { flex: 1, color: c.text },
   contactAction: { marginTop: 14 },
   contactDetails: {
-    padding: 16,
-    marginTop: 12,
-    borderRadius: 14,
+    padding: 14,
+    marginTop: 10,
+    borderRadius: radius.card,
     borderWidth: 1,
     borderColor: c.border,
     backgroundColor: c.white,
@@ -576,19 +570,22 @@ const styles = StyleSheet.create({
   state: { marginTop: 24, padding: 16, gap: 16 },
   success: {
     marginTop: 12,
-    padding: 14,
-    backgroundColor: c.paid,
-    borderRadius: 10,
-    fontFamily: f.regular,
-    fontSize: 14,
-    color: c.text,
+    padding: 12,
+    backgroundColor: palette.successSurface,
+    borderRadius: radius.card,
+    fontFamily: fonts.regular,
+    fontSize: 13,
+    color: palette.success,
   },
   actionError: {
     marginTop: 12,
-    fontFamily: f.regular,
-    fontSize: 14,
-    lineHeight: 22,
-    color: c.text,
+    padding: 12,
+    borderRadius: radius.card,
+    backgroundColor: palette.dangerSurface,
+    fontFamily: fonts.regular,
+    fontSize: 13,
+    lineHeight: 19,
+    color: palette.danger,
   },
   refresh: {
     minHeight: 44,

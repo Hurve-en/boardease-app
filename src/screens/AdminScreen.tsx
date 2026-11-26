@@ -1,3 +1,4 @@
+import { fonts, palette, radius } from "@/constants/theme";
 import { historyColors as c, historyFonts as f } from "@/features/billing-history/theme";
 import { fetchAdminDashboard, type AdminDashboardData } from "@/features/admin-dashboard/api";
 import { AdminTabBar } from "@/components/navigation/AdminTabBar";
@@ -13,6 +14,13 @@ const currency = new Intl.NumberFormat("en-PH", {style: "currency", currency: "P
 function money(value: string) {
   const amount = Number(value);
   return currency.format(Number.isFinite(amount) ? amount : 0);
+}
+
+function dayLabel(value: string) {
+  const date = new Date(`${value.slice(0, 10)}T12:00:00`);
+  return Number.isNaN(date.getTime())
+    ? value
+    : date.toLocaleDateString("en-GB", {day: "numeric", month: "short", year: "numeric"});
 }
 
 function monthLabel(value: string) {
@@ -106,7 +114,7 @@ export default function AdminScreen() {
               <View style={styles.metricCard}>
                 <Text style={styles.metricLabel}>Bills this month</Text>
                 <Text style={styles.metricValue}>{data.billing.paidCount + data.billing.partialCount + data.billing.unpaidCount}</Text>
-                <Text style={styles.metricHint}>{data.billing.paidCount} paid · {data.billing.partialCount} partial · {data.billing.unpaidCount} unpaid</Text>
+                <Text style={styles.metricHint}>{data.billing.paidCount} paid, {data.billing.partialCount} partial, {data.billing.unpaidCount} unpaid</Text>
               </View>
             </View>
 
@@ -118,7 +126,7 @@ export default function AdminScreen() {
                 </View>
                 <View style={styles.paymentCopy}>
                   <Text style={styles.paymentName}>{payment.tenantName}</Text>
-                  <Text style={styles.paymentDate}>{payment.paymentDate}</Text>
+                  <Text style={styles.paymentDate}>{dayLabel(payment.paymentDate)}</Text>
                 </View>
                 <Text style={styles.paymentAmount}>{money(payment.amount)}</Text>
               </View>
@@ -135,32 +143,32 @@ export default function AdminScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: {flex: 1, backgroundColor: c.background},
-  loading: {flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: c.background},
-  content: {flexGrow: 1, width: "100%", maxWidth: 600, alignSelf: "center", paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32},
+  safe: {flex: 1, backgroundColor: palette.canvas},
+  loading: {flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: palette.canvas},
+  content: {flexGrow: 1, width: "100%", maxWidth: 600, alignSelf: "center", paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24},
   pressed: {opacity: 0.65},
-  sectionLabel: {fontFamily: f.bold, fontSize: 14, color: c.text, marginBottom: 10},
-  billingCard: {padding: 19, borderRadius: 16, backgroundColor: c.brown},
-  cardLabel: {fontFamily: f.regular, fontSize: 13, color: "#EAD9C9"},
-  total: {fontFamily: f.bold, fontSize: 32, color: c.white, marginTop: 7},
-  billingRow: {flexDirection: "row", justifyContent: "space-between", gap: 16, marginTop: 16, paddingTop: 14, borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.24)"},
-  billingLabel: {fontFamily: f.regular, fontSize: 12, color: "#EAD9C9"},
-  billingValue: {fontFamily: f.bold, fontSize: 14, color: c.white, marginTop: 4},
-  metricGrid: {flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 14},
-  metricCard: {width: "48%", flexGrow: 1, minHeight: 100, padding: 15, borderRadius: 14, borderWidth: 1, borderColor: c.border, backgroundColor: c.white},
-  metricLabel: {fontFamily: f.regular, fontSize: 12, color: c.muted},
-  metricValue: {fontFamily: f.bold, fontSize: 23, color: c.text, marginTop: 8},
-  metricHint: {fontFamily: f.regular, fontSize: 10, lineHeight: 15, color: c.muted, marginTop: 3},
-  sectionTitle: {fontFamily: f.bold, fontSize: 17, color: c.text, marginTop: 24, marginBottom: 10},
-  paymentRow: {flexDirection: "row", alignItems: "center", gap: 11, minHeight: 62, paddingHorizontal: 12, borderBottomWidth: 1, borderBottomColor: c.border, backgroundColor: c.white},
-  paymentIcon: {width: 36, height: 36, alignItems: "center", justifyContent: "center", borderRadius: 10, backgroundColor: c.beige},
+  sectionLabel: {fontFamily: f.regular, fontSize: 13, color: c.muted, marginBottom: 8},
+  billingCard: {padding: 14, borderRadius: radius.card, borderWidth: 1, borderColor: c.border, backgroundColor: c.white},
+  cardLabel: {fontFamily: fonts.medium, fontSize: 13, color: c.text},
+  total: {fontFamily: fonts.medium, fontSize: 30, letterSpacing: -0.8, color: c.text, marginTop: 6, fontVariant: ["tabular-nums"]},
+  billingRow: {flexDirection: "row", justifyContent: "space-between", gap: 16, marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: c.border},
+  billingLabel: {fontFamily: f.regular, fontSize: 12, color: c.muted},
+  billingValue: {fontFamily: f.bold, fontSize: 15, color: c.text, marginTop: 2, fontVariant: ["tabular-nums"]},
+  metricGrid: {flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8},
+  metricCard: {width: "48%", flexGrow: 1, padding: 12, borderRadius: radius.card, borderWidth: 1, borderColor: c.border, backgroundColor: c.white},
+  metricLabel: {fontFamily: fonts.medium, fontSize: 13, color: c.text},
+  metricValue: {fontFamily: fonts.medium, fontSize: 22, letterSpacing: -0.5, color: c.text, marginTop: 6, fontVariant: ["tabular-nums"]},
+  metricHint: {fontFamily: f.regular, fontSize: 12, lineHeight: 16, color: c.muted, marginTop: 2},
+  sectionTitle: {fontFamily: f.bold, fontSize: 15, color: c.text, marginTop: 20, marginBottom: 8},
+  paymentRow: {flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 10, paddingHorizontal: 12, marginBottom: 6, borderRadius: radius.card, borderWidth: 1, borderColor: c.border, backgroundColor: c.white},
+  paymentIcon: {width: 32, height: 32, alignItems: "center", justifyContent: "center", borderRadius: radius.control, backgroundColor: c.beige},
   paymentCopy: {flex: 1},
-  paymentName: {fontFamily: f.bold, fontSize: 13, color: c.text},
-  paymentDate: {fontFamily: f.regular, fontSize: 11, color: c.muted, marginTop: 3},
-  paymentAmount: {fontFamily: f.bold, fontSize: 13, color: c.text},
+  paymentName: {fontFamily: fonts.medium, fontSize: 14, color: c.text},
+  paymentDate: {fontFamily: f.regular, fontSize: 12, color: c.muted, marginTop: 2},
+  paymentAmount: {fontFamily: f.bold, fontSize: 14, color: palette.success, fontVariant: ["tabular-nums"]},
   state: {flex: 1, alignItems: "center", justifyContent: "center", gap: 12, padding: 20},
   body: {fontFamily: f.regular, fontSize: 13, lineHeight: 20, color: c.muted},
-  error: {fontFamily: f.regular, fontSize: 13, lineHeight: 20, textAlign: "center", color: "#9A3529"},
-  retry: {paddingHorizontal: 18, paddingVertical: 10, borderRadius: 10, backgroundColor: c.brown},
+  error: {fontFamily: f.regular, fontSize: 13, lineHeight: 20, textAlign: "center", color: palette.danger},
+  retry: {paddingHorizontal: 18, paddingVertical: 10, borderRadius: radius.pill, backgroundColor: c.brown},
   retryText: {fontFamily: f.bold, fontSize: 13, color: c.white},
 });
