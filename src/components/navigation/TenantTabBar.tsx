@@ -1,3 +1,4 @@
+import { InboxTab } from "./InboxTab";
 import { router } from "expo-router";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -37,6 +38,7 @@ export function TenantTabBar({
             }}
           />
         ))}
+        <InboxTab />
       </View>
     </SafeAreaView>
   );
