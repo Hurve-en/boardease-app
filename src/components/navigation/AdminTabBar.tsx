@@ -1,13 +1,17 @@
-import { InboxTab } from "./InboxTab";
 import { fonts, palette } from "@/constants/theme";
 import { signOut } from "@/lib/auth";
 import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { InboxTab } from "./InboxTab";
 import { TabItem, tabBarStyles } from "./TabItem";
 
-export function AdminTabBar({ active }: { active: "dashboard" | "payments" }) {
+export function AdminTabBar({
+  active,
+}: {
+  active: "dashboard" | "payments" | "notifications";
+}) {
   const [signingOut, setSigningOut] = useState(false);
   const [error, setError] = useState("");
 
@@ -32,7 +36,11 @@ export function AdminTabBar({ active }: { active: "dashboard" | "payments" }) {
         </Text>
       ) : null}
       <SafeAreaView edges={["bottom"]} style={tabBarStyles.bar}>
-        <View style={tabBarStyles.tabs} accessibilityRole="tablist" accessibilityLabel="Admin navigation">
+        <View
+          style={tabBarStyles.tabs}
+          accessibilityRole="tablist"
+          accessibilityLabel="Admin navigation"
+        >
           <TabItem
             label="Dashboard"
             icon="grid-outline"
@@ -45,7 +53,9 @@ export function AdminTabBar({ active }: { active: "dashboard" | "payments" }) {
             icon="card-outline"
             activeIcon="card"
             selected={active === "payments"}
-            onPress={() => active !== "payments" && router.replace("/admin-payments")}
+            onPress={() =>
+              active !== "payments" && router.replace("/admin-payments")
+            }
           />
           <InboxTab />
           <TabItem
