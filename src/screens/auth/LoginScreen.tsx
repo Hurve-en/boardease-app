@@ -4,14 +4,14 @@ import {getUserRole, signIn} from "@/lib/auth";
 import {useRouter} from "expo-router";
 import {useState} from "react";
 import {
-	KeyboardAvoidingView,
+	Keyboard,
 	Platform,
 	Pressable,
-	ScrollView,
 	StyleSheet,
 	Text,
 	View,
 } from "react-native";
+import Animated, {useAnimatedKeyboard, useAnimatedStyle} from "react-native-reanimated";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 import {Image} from "expo-image";
 import {StatusBar} from "expo-status-bar";
@@ -27,6 +27,15 @@ export default function LoginScreen() {
 	const [problem, setProblem] = useState("");
 	const [notice, setNotice] = useState("");
 	const [busy, setBusy] = useState(false);
+	const keyboard = useAnimatedKeyboard();
+	const bottomPad = insets.bottom + 32;
+
+	// Follow the keyboard frame by frame on the UI thread so the whole sheet rises
+	// together with it. Android resizes the window for the keyboard on its own.
+	const sheetLift = useAnimatedStyle(() => {
+		const lift = Platform.OS === "ios" ? Math.max(0, keyboard.height.value - bottomPad + 20) : 0;
+		return {transform: [{translateY: -lift}]};
+	});
 
 	async function handleSignIn() {
 		if (busy) return;
@@ -66,24 +75,15 @@ export default function LoginScreen() {
 	}
 
 	return (
-		<View style={styles.root}>
+		<Pressable style={styles.root} onPress={Keyboard.dismiss} accessible={false}>
 			<StatusBar style="light" />
 			<Image source={require("@/assets/brand/login-hero.jpg")} style={styles.hero} contentFit="cover" contentPosition="top" accessible={false} />
 			<View style={[styles.brand, {top: insets.top + 16}]}>
 				<LogoMark size={28} />
 				<Text style={styles.brandName}>BoardEase</Text>
 			</View>
-			<KeyboardAvoidingView
-				style={{flex: 1}}
-				behavior={Platform.OS === "ios" ? "padding" : undefined}>
-				<ScrollView
-					contentContainerStyle={styles.scroll}
-					keyboardShouldPersistTaps="handled"
-					bounces={false}
-					alwaysBounceVertical={false}
-					overScrollMode="never"
-					showsVerticalScrollIndicator={false}>
-					<View style={[styles.sheet, {paddingBottom: insets.bottom + 32}]}>
+				<View style={styles.stage}>
+					<Animated.View style={[styles.sheet, {paddingBottom: bottomPad}, sheetLift]}>
 					<View style={styles.container}>
 					<Text style={styles.title}>Sign in to BoardEase</Text>
 					<Text style={styles.subtitle}>See your bills, payments and room details.</Text>
@@ -130,10 +130,9 @@ export default function LoginScreen() {
 						</Text>
 					</Text>
 					</View>
-					</View>
-				</ScrollView>
-			</KeyboardAvoidingView>
-		</View>
+					</Animated.View>
+				</View>
+		</Pressable>
 	);
 }
 
@@ -142,7 +141,7 @@ const styles = StyleSheet.create({
 	hero: {position: "absolute", top: 0, left: 0, right: 0, height: "62%"},
 	brand: {position: "absolute", left: 24, flexDirection: "row", alignItems: "center", gap: 10, zIndex: 1},
 	brandName: {fontFamily: fonts.bold, fontSize: 18, letterSpacing: -0.4, color: palette.inverse},
-	scroll: {flexGrow: 1, justifyContent: "flex-end"},
+	stage: {flex: 1, justifyContent: "flex-end"},
 	sheet: {marginTop: 220, backgroundColor: palette.surface, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingTop: 8},
 	container: {padding: 24, paddingBottom: 0, width: "100%", maxWidth: 420, alignSelf: "center"},
 	title: {marginTop: 8, textAlign: "center", fontSize: 24, letterSpacing: -0.5, fontFamily: fonts.semibold, color: palette.text},

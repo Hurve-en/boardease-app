@@ -5,8 +5,6 @@ import { signIn } from "@/lib/auth";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -91,11 +89,9 @@ export default function RegisterScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
         <ScrollView
+          style={{ flex: 1 }}
+          automaticallyAdjustKeyboardInsets
           contentContainerStyle={styles.container}
           keyboardShouldPersistTaps="handled"
         >
@@ -164,7 +160,6 @@ export default function RegisterScreen() {
             </Link>
           </Text>
         </ScrollView>
-      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
